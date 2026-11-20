@@ -4,16 +4,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Happy Birthday 專屬生日驚喜</title>
+  <title>生日尋寶大作戰 🎁</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
-      --bg-color: #fdf8f5;
-      --card-bg: #ffffff;
+      --bg: #fdf8f5;
+      --card: #ffffff;
       --primary: #d9777f;
       --primary-dark: #b85d65;
-      --text-main: #4a3f3d;
-      --text-sub: #8c7b78;
+      --accent: #f3e5e7;
+      --text: #4a3f3d;
+      --sub: #8c7b78;
     }
 
     * {
@@ -21,67 +22,91 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
+      background-color: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
-      overflow-x: hidden;
+      padding: 16px;
     }
 
     .container {
       width: 100%;
-      max-width: 400px;
-      background: var(--card-bg);
+      max-width: 420px;
+      background: var(--card);
       border-radius: 24px;
-      padding: 32px 24px;
+      padding: 28px 22px;
       box-shadow: 0 12px 32px rgba(217, 119, 127, 0.15);
       text-align: center;
-      transition: all 0.4s ease;
     }
 
-    .lock-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
+    .stage {
+      display: none;
+      animation: fadeIn 0.45s ease forwards;
+    }
+
+    .stage.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .step-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
     }
 
     h1 {
-      font-size: 22px;
+      font-size: 21px;
       margin-bottom: 8px;
-      color: var(--text-main);
     }
 
-    p.subtitle {
+    .subtitle {
       font-size: 14px;
-      color: var(--text-sub);
-      margin-bottom: 24px;
+      color: var(--sub);
+      margin-bottom: 22px;
       line-height: 1.5;
     }
 
     input[type="tel"] {
       width: 100%;
       padding: 14px;
-      font-size: 18px;
+      font-size: 20px;
       text-align: center;
-      letter-spacing: 4px;
+      letter-spacing: 6px;
       border: 2px solid #eedcd9;
       border-radius: 12px;
       outline: none;
-      margin-bottom: 16px;
-      color: var(--text-main);
-      transition: border-color 0.3s;
+      margin-bottom: 14px;
+      color: var(--text);
     }
 
     input:focus {
       border-color: var(--primary);
     }
 
-    button {
+    .btn {
       width: 100%;
       padding: 14px;
       background-color: var(--primary);
@@ -91,10 +116,10 @@
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
+      transition: transform 0.1s, background-color 0.2s;
     }
 
-    button:active {
+    .btn:active {
       transform: scale(0.98);
       background-color: var(--primary-dark);
     }
@@ -102,235 +127,421 @@
     .error-msg {
       color: #e05252;
       font-size: 13px;
-      margin-top: 12px;
-      min-height: 20px;
+      margin-top: 10px;
+      min-height: 18px;
     }
 
-    #main-content {
-      display: none;
-      animation: fadeIn 0.8s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .badge {
-      display: inline-block;
-      background: #fcebed;
-      color: var(--primary);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
+    /* 第二關：問答選項 */
+    .quiz-q {
+      font-size: 17px;
       font-weight: bold;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+      color: var(--text);
     }
 
-    .letter-box {
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      width: 100%;
+      padding: 13px 16px;
       background: #faf5f2;
-      border-radius: 16px;
-      padding: 20px;
+      border: 2px solid #eedcd9;
+      border-radius: 12px;
+      font-size: 15px;
+      color: var(--text);
       text-align: left;
-      font-size: 15px;
-      line-height: 1.8;
-      margin: 20px 0;
-      color: var(--text-main);
-      border: 1px dashed #e6d2ce;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .scratch-title {
-      font-size: 15px;
+    .option-btn:active {
+      background: var(--accent);
+      border-color: var(--primary);
+    }
+
+    /* 第三關：記憶翻牌遊戲 */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .card-item {
+      aspect-ratio: 1 / 1;
+      background: var(--primary);
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.25s, background-color 0.25s;
+      color: transparent;
+      box-shadow: 0 4px 10px rgba(217, 119, 127, 0.2);
+    }
+
+    .card-item::after {
+      content: "?";
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 24px;
       font-weight: bold;
-      margin-bottom: 12px;
-      color: var(--primary-dark);
     }
 
-    .scratch-container {
+    .card-item.flipped,
+    .card-item.matched {
+      background: #faf5f2;
+      border: 2px solid #eedcd9;
+      color: var(--text);
+      transform: rotateY(180deg);
+    }
+
+    .card-item.flipped::after,
+    .card-item.matched::after {
+      content: none;
+    }
+
+    .card-item.matched {
+      background: #fcebed;
+      border-color: var(--primary);
+    }
+
+    /* 第四關：最終線索區 */
+    .clue-box {
+      background: #faf5f2;
+      border: 2px dashed var(--primary);
+      border-radius: 16px;
+      padding: 20px 16px;
+      margin: 18px 0;
+      text-align: left;
+    }
+
+    .clue-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+
+    .clue-text {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .scratch-wrap {
       position: relative;
       width: 100%;
-      height: 120px;
-      border-radius: 16px;
+      height: 110px;
+      border-radius: 14px;
       overflow: hidden;
-      margin: 0 auto;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-top: 14px;
       user-select: none;
     }
 
-    .prize-text {
+    .secret-spot {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: linear-gradient(135deg, #fff0f1 0%, #ffe3e6 100%);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 12px;
+      padding: 10px;
     }
 
-    .prize-text strong {
-      font-size: 18px;
+    .secret-spot strong {
+      font-size: 17px;
       color: var(--primary-dark);
-      margin-bottom: 4px;
     }
 
-    .prize-text span {
+    .secret-spot span {
       font-size: 12px;
-      color: var(--text-sub);
+      color: var(--sub);
+      margin-top: 4px;
     }
 
     canvas#scratch-pad {
       position: absolute;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
-      cursor: pointer;
       touch-action: none;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 第一關：密碼鎖定畫面 -->
-  <div class="container" id="lock-screen">
-    <div class="lock-icon">🔒</div>
-    <h1>專屬生日驚喜空間</h1>
-    <p class="subtitle">請輸入實體卡片上的 4 位數通關密碼<br>解鎖你的生日禮物</p>
-
-    <input type="tel" id="password-input" maxlength="4" placeholder="••••">
-    <button onclick="checkPassword()">解鎖驚喜</button>
-    <div class="error-msg" id="error-msg"></div>
-  </div>
-
-  <!-- 第二關：解鎖後的生日卡片與刮刮樂 -->
-  <div class="container" id="main-content">
-    <div class="badge">✨ HAPPY BIRTHDAY ✨</div>
-    <h1>生日快樂，我的寶貝！</h1>
-
-    <div class="letter-box">
-      <p>親愛的：</p>
-      <br>
-      <p>很高興你順利解開了卡片上的密碼！這一年謝謝你一直陪在我身邊，不管開心或忙碌，有你在的日子都變得特別有意義。</p>
-      <br>
-      <p>希望你喜歡這份手作卡片和這個小小網頁，願你新的一歲每天都開開心心、平安健康！</p>
-      <br>
-      <p style="text-align: right; font-weight: bold;">愛你的 我 ❤️</p>
+  <div class="container">
+    <!-- 關卡 1：密碼啟動 -->
+    <div id="stage-1" class="stage active">
+      <div class="step-badge">STAGE 1 / 3 · 啟動任務</div>
+      <h1>生日尋寶系統 🔒</h1>
+      <p class="subtitle">生日快樂！實體卡片被我藏起來了<br>請先輸入 4 位數通關密碼啟動線索</p>
+      <input type="tel" id="pwd-input" maxlength="4" placeholder="••••">
+      <button class="btn" onclick="checkPassword()">驗證密碼</button>
+      <div id="pwd-error" class="error-msg"></div>
     </div>
 
-    <!-- 刮刮樂區域 -->
-    <div class="scratch-title">👇 用手指刮開下方銀漆，領取生日大獎 👇</div>
-    <div class="scratch-container">
-      <div class="prize-text">
-        <strong>🎟️ 無條件願望兌換券 x1</strong>
-        <span>（大餐、按摩或任何你想做的事，截圖生效！）</span>
+    <!-- 關卡 2：默契快問快答 -->
+    <div id="stage-2" class="stage">
+      <div class="step-badge" id="quiz-progress">STAGE 2 / 3 · 默契考驗 (1/3)</div>
+      <h1>答對全部才能前進！</h1>
+      <p class="subtitle">測試一下你對我們的記憶力</p>
+      <div id="quiz-question" class="quiz-q"></div>
+      <div id="quiz-options" class="options-list"></div>
+      <div id="quiz-error" class="error-msg"></div>
+    </div>
+
+    <!-- 關卡 3：記憶翻牌挑戰 -->
+    <div id="stage-3" class="stage">
+      <div class="step-badge">STAGE 3 / 3 · 最終考驗</div>
+      <h1>配對所有生日元素 🎂</h1>
+      <p class="subtitle">找出全部 6 組相同的圖案，解鎖藏寶地點！</p>
+      <div id="memory-grid" class="memory-grid"></div>
+    </div>
+
+    <!-- 最終通關：藏寶線索 -->
+    <div id="stage-4" class="stage">
+      <div class="step-badge">🎉 MISSION COMPLETE 🎉</div>
+      <h1>恭喜通關！生日快樂 ❤️</h1>
+      <p class="subtitle">你成功解開所有謎題，快去把卡片找出來吧！</p>
+
+      <div class="clue-box">
+        <div class="clue-title">📍 尋寶線索提示：</div>
+        <div class="clue-text" id="clue-description"></div>
+
+        <div class="scratch-wrap">
+          <div class="secret-spot">
+            <strong id="final-location"></strong>
+            <span id="final-sub"></span>
+          </div>
+          <canvas id="scratch-pad"></canvas>
+        </div>
       </div>
-      <canvas id="scratch-pad"></canvas>
     </div>
   </div>
 
   <script>
-    const SECRET_PASSWORD = "0109"; // 修改這裡設定密碼
-    const ERROR_TEXT = "密碼不對喔～再仔細看看卡片上的線索吧！😜";
+    // =========================================================
+    // 🔧 【自訂設定區】只需修改這裡的內容即可！
+    // =========================================================
+    const CONFIG = {
+      // 1. 第一關密碼（4位數字）
+      password: "0109",
+      passwordHint: "密碼不對喔～提示：你的生日或我們的紀念日！",
 
+      // 2. 第二關默契問答（可自由增減題目，answer 為正確選項的索引值 0, 1, 2...）
+      quizzes: [
+        {
+          question: "Q1. 我們第一次一起去吃飯／約會的地方是哪裡？",
+          options: ["夜市撈金魚", "電影院看恐怖片", "咖啡廳聊天"],
+          answer: 2, // 0代表第一個選項，1代表第二個，2代表第三個
+          wrongTip: "再想一下！提示：那天有喝飲料喔～"
+        },
+        {
+          question: "Q2. 我平常最常對你說的一句話是什麼？",
+          options: ["你今天好漂亮", "快去睡覺不要熬夜", "等一下要吃什麼"],
+          answer: 2,
+          wrongTip: "不對喔，每天到了飯點我都會問這句！"
+        },
+        {
+          question: "Q3. 今天是你幾歲（或我們在一起第幾年）的特別日子？",
+          options: ["永遠的 18 歲", "24 歲生日快樂", "3 歲小朋友"],
+          answer: 1,
+          wrongTip: "雖然你很可愛，但請選真實數字啦 😜"
+        }
+      ],
+
+      // 3. 第三關翻牌圖示（固定 6 種 emoji，系統會自動複製成 12 張洗牌）
+      cardEmojis: ["🎂", "🎁", "❤️", "🧸", "🥂", "✨"],
+
+      // 4. 通關後的藏寶線索（文字提示 + 刮刮樂揭曉最終位置）
+      clueHint: "線索就在我們最常待著的空間裡，往「每天出門前一定會看的地方」或「軟綿綿的角落」找找看！刮開下方查看確切位置 👇",
+      finalSpotTitle: "🛏️ 臥室床頭櫃的第二個抽屜裡！",
+      finalSpotSub: "（找到卡片後記得回來找我領生日擁抱 ❤️）"
+    };
+    // =========================================================
+
+    // 切換關卡畫面
+    function showStage(num) {
+      document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
+      document.getElementById(`stage-${num}`).classList.add('active');
+    }
+
+    // --- 關卡 1 邏輯 ---
     function checkPassword() {
-      const input = document.getElementById('password-input').value.trim();
-      const errorMsg = document.getElementById('error-msg');
-
-      if (input === SECRET_PASSWORD) {
-        document.getElementById('lock-screen').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-
-        fireConfetti();
-        initScratchCard();
+      const val = document.getElementById('pwd-input').value.trim();
+      if (val === CONFIG.password) {
+        showStage(2);
+        renderQuiz();
       } else {
-        errorMsg.textContent = ERROR_TEXT;
-        const inputEl = document.getElementById('password-input');
-        inputEl.value = '';
-        inputEl.focus();
+        document.getElementById('pwd-error').textContent = CONFIG.passwordHint;
+        const input = document.getElementById('pwd-input');
+        input.value = '';
+        input.focus();
       }
     }
 
-    document.getElementById('password-input').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        checkPassword();
-      }
+    document.getElementById('pwd-input').addEventListener('keypress', e => {
+      if (e.key === 'Enter') checkPassword();
     });
 
-    function fireConfetti() {
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
+    // --- 關卡 2 邏輯 ---
+    let currentQuizIdx = 0;
+
+    function renderQuiz() {
+      const total = CONFIG.quizzes.length;
+      const q = CONFIG.quizzes[currentQuizIdx];
+      document.getElementById('quiz-progress').textContent = `STAGE 2 / 3 · 默契考驗 (${currentQuizIdx + 1}/${total})`;
+      document.getElementById('quiz-question').textContent = q.question;
+      document.getElementById('quiz-error').textContent = '';
+
+      const optionsBox = document.getElementById('quiz-options');
+      optionsBox.innerHTML = '';
+
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = optText;
+        btn.onclick = () => handleQuizAnswer(idx);
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(selectedIdx) {
+      const q = CONFIG.quizzes[currentQuizIdx];
+      if (selectedIdx === q.answer) {
+        currentQuizIdx++;
+        if (currentQuizIdx < CONFIG.quizzes.length) {
+          renderQuiz();
+        } else {
+          showStage(3);
+          initMemoryGame();
+        }
+      } else {
+        document.getElementById('quiz-error').textContent = q.wrongTip;
       }
+    }
+
+    // --- 關卡 3 邏輯（記憶翻牌） ---
+    function initMemoryGame() {
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+
+      // 複製成對並洗牌
+      const deck = [...CONFIG.cardEmojis, ...CONFIG.cardEmojis]
+        .sort(() => Math.random() - 0.5);
+
+      let flippedCards = [];
+      let matchedCount = 0;
+      let lockBoard = false;
+
+      deck.forEach((emoji) => {
+        const card = document.createElement('div');
+        card.className = 'card-item';
+        card.textContent = emoji;
+
+        card.addEventListener('click', () => {
+          if (lockBoard || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+          card.classList.add('flipped');
+          flippedCards.push(card);
+
+          if (flippedCards.length === 2) {
+            lockBoard = true;
+            const [c1, c2] = flippedCards;
+
+            if (c1.textContent === c2.textContent) {
+              c1.classList.add('matched');
+              c2.classList.add('matched');
+              flippedCards = [];
+              lockBoard = false;
+              matchedCount += 2;
+
+              if (matchedCount === deck.length) {
+                setTimeout(unlockFinalStage, 500);
+              }
+            } else {
+              setTimeout(() => {
+                c1.classList.remove('flipped');
+                c2.classList.remove('flipped');
+                flippedCards = [];
+                lockBoard = false;
+              }, 700);
+            }
+          }
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    // --- 關卡 4 邏輯（通關與刮刮樂） ---
+    function unlockFinalStage() {
+      document.getElementById('clue-description').textContent = CONFIG.clueHint;
+      document.getElementById('final-location').textContent = CONFIG.finalSpotTitle;
+      document.getElementById('final-sub').textContent = CONFIG.finalSpotSub;
+
+      showStage(4);
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
+      }
+
+      initScratchCard();
     }
 
     function initScratchCard() {
       const canvas = document.getElementById('scratch-pad');
       const ctx = canvas.getContext('2d');
-      const container = canvas.parentElement;
+      const wrap = canvas.parentElement;
 
-      canvas.width = container.offsetWidth;
-      canvas.height = container.offsetHeight;
+      canvas.width = wrap.offsetWidth;
+      canvas.height = wrap.offsetHeight;
 
       ctx.fillStyle = '#cccccc';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#777777';
-      ctx.font = 'bold 16px sans-serif';
+      ctx.fillStyle = '#666666';
+      ctx.font = 'bold 15px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('✨ 刮開這裡 ✨', canvas.width / 2, canvas.height / 2);
+      ctx.fillText('✨ 用手指刮開看最終藏寶地點 ✨', canvas.width / 2, canvas.height / 2);
 
       let isDrawing = false;
 
-      function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
-        };
-      }
-
       function scratch(e) {
         if (!isDrawing) return;
-        const pos = getPos(e);
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
+        ctx.arc(x, y, 22, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // 統一使用 Pointer Events，同時支援滑鼠與手機觸控
-      canvas.addEventListener('pointerdown', (e) => {
+      canvas.addEventListener('pointerdown', e => {
         isDrawing = true;
         canvas.setPointerCapture(e.pointerId);
         scratch(e);
       });
-
       canvas.addEventListener('pointermove', scratch);
-
-      canvas.addEventListener('pointerup', (e) => {
+      canvas.addEventListener('pointerup', e => {
         isDrawing = false;
         canvas.releasePointerCapture(e.pointerId);
       });
-
-      canvas.addEventListener('pointercancel', () => {
-        isDrawing = false;
-      });
+      canvas.addEventListener('pointercancel', () => isDrawing = false);
     }
   </script>
 </body>
