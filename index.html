@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Happy Birthday 專屬生日驚喜</title>
-  <!-- 引入慶生彩帶特效套件 -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
@@ -45,7 +45,6 @@
       transition: all 0.4s ease;
     }
 
-    /* 密碼解鎖區 */
     .lock-icon {
       font-size: 48px;
       margin-bottom: 16px;
@@ -64,7 +63,7 @@
       line-height: 1.5;
     }
 
-    input[type="text"], input[type="tel"] {
+    input[type="tel"] {
       width: 100%;
       padding: 14px;
       font-size: 18px;
@@ -107,15 +106,21 @@
       min-height: 20px;
     }
 
-    /* 主內容區（預設隱藏） */
     #main-content {
       display: none;
       animation: fadeIn 0.8s ease forwards;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .badge {
@@ -141,7 +146,6 @@
       border: 1px dashed #e6d2ce;
     }
 
-    /* 刮刮樂區塊 */
     .scratch-title {
       font-size: 15px;
       font-weight: bold;
@@ -156,7 +160,7 @@
       border-radius: 16px;
       overflow: hidden;
       margin: 0 auto;
-      box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
       user-select: none;
     }
 
@@ -192,10 +196,11 @@
       width: 100%;
       height: 100%;
       cursor: pointer;
-      touch-action: none; /* 防止手機滑動刮開時畫面跟著捲動 */
+      touch-action: none;
     }
   </style>
 </head>
+
 <body>
 
   <!-- 第一關：密碼鎖定畫面 -->
@@ -203,8 +208,7 @@
     <div class="lock-icon">🔒</div>
     <h1>專屬生日驚喜空間</h1>
     <p class="subtitle">請輸入實體卡片上的 4 位數通關密碼<br>解鎖你的生日禮物</p>
-    
-    <!-- 這裡可以使用 type="tel" 讓手機自動跳出數字鍵盤 -->
+
     <input type="tel" id="password-input" maxlength="4" placeholder="••••">
     <button onclick="checkPassword()">解鎖驚喜</button>
     <div class="error-msg" id="error-msg"></div>
@@ -214,7 +218,7 @@
   <div class="container" id="main-content">
     <div class="badge">✨ HAPPY BIRTHDAY ✨</div>
     <h1>生日快樂，我的寶貝！</h1>
-    
+
     <div class="letter-box">
       <p>親愛的：</p>
       <br>
@@ -237,67 +241,54 @@
   </div>
 
   <script>
-    // ==========================================
-    // 🔧 你可以在這裡自訂修改設定！
-    // ==========================================
-    const SECRET_PASSWORD = "0109"; // 預設密碼，可改成你們的紀念日或她的生日
+    const SECRET_PASSWORD = "0109"; // 修改這裡設定密碼
     const ERROR_TEXT = "密碼不對喔～再仔細看看卡片上的線索吧！😜";
-    // ==========================================
 
     function checkPassword() {
       const input = document.getElementById('password-input').value.trim();
       const errorMsg = document.getElementById('error-msg');
 
       if (input === SECRET_PASSWORD) {
-        // 隱藏密碼畫面，顯示主內容
         document.getElementById('lock-screen').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
-        
-        // 噴發慶生彩帶特效
+
         fireConfetti();
-        
-        // 初始化刮刮樂畫布
         initScratchCard();
       } else {
         errorMsg.textContent = ERROR_TEXT;
-        // 震動輸入框提示錯誤
         const inputEl = document.getElementById('password-input');
         inputEl.value = '';
         inputEl.focus();
       }
     }
 
-    // 支援按下 Enter 鍵送出密碼
-    document.getElementById('password-input').addEventListener('keypress', function(e) {
+    document.getElementById('password-input').addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
         checkPassword();
       }
     });
 
-    // 彩帶動畫函數
     function fireConfetti() {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
     }
 
-    // 刮刮樂功能實作
     function initScratchCard() {
       const canvas = document.getElementById('scratch-pad');
       const ctx = canvas.getContext('2d');
       const container = canvas.parentElement;
 
-      // 設定畫布解析度符合容器大小
       canvas.width = container.offsetWidth;
       canvas.height = container.offsetHeight;
 
-      // 畫上銀色刮刮樂塗層
       ctx.fillStyle = '#cccccc';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 加上提示文字
       ctx.fillStyle = '#777777';
       ctx.font = 'bold 16px sans-serif';
       ctx.textAlign = 'center';
@@ -308,17 +299,14 @@
 
       function getPos(e) {
         const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return {
-          x: clientX - rect.left,
-          y: clientY - rect.top
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
         };
       }
 
       function scratch(e) {
         if (!isDrawing) return;
-        e.preventDefault();
         const pos = getPos(e);
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
@@ -326,5 +314,25 @@
         ctx.fill();
       }
 
-      // 滑鼠事件（電腦測試用）
-      canvas.addEventListener('mousedown', (e
+      // 統一使用 Pointer Events，同時支援滑鼠與手機觸控
+      canvas.addEventListener('pointerdown', (e) => {
+        isDrawing = true;
+        canvas.setPointerCapture(e.pointerId);
+        scratch(e);
+      });
+
+      canvas.addEventListener('pointermove', scratch);
+
+      canvas.addEventListener('pointerup', (e) => {
+        isDrawing = false;
+        canvas.releasePointerCapture(e.pointerId);
+      });
+
+      canvas.addEventListener('pointercancel', () => {
+        isDrawing = false;
+      });
+    }
+  </script>
+</body>
+
+</html>
