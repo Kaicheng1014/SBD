@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Happy Birthday 專屬生日驚喜</title>
+  <!-- 引入慶生彩帶特效套件 -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #fdf8f5;
+      --card-bg: #ffffff;
+      --primary: #d9777f;
+      --primary-dark: #b85d65;
+      --text-main: #4a3f3d;
+      --text-sub: #8c7b78;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 12px 32px rgba(217, 119, 127, 0.15);
+      text-align: center;
+      transition: all 0.4s ease;
+    }
+
+    /* 密碼解鎖區 */
+    .lock-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    input[type="text"], input[type="tel"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      text-align: center;
+      letter-spacing: 4px;
+      border: 2px solid #eedcd9;
+      border-radius: 12px;
+      outline: none;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+      background-color: var(--primary-dark);
+    }
+
+    .error-msg {
+      color: #e05252;
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    /* 主內容區（預設隱藏） */
+    #main-content {
+      display: none;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .badge {
+      display: inline-block;
+      background: #fcebed;
+      color: var(--primary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .letter-box {
+      background: #faf5f2;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: left;
+      font-size: 15px;
+      line-height: 1.8;
+      margin: 20px 0;
+      color: var(--text-main);
+      border: 1px dashed #e6d2ce;
+    }
+
+    /* 刮刮樂區塊 */
+    .scratch-title {
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+    }
+
+    .scratch-container {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 0 auto;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+      user-select: none;
+    }
+
+    .prize-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #fff0f1 0%, #ffe3e6 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .prize-text strong {
+      font-size: 18px;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
+
+    .prize-text span {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    canvas#scratch-pad {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      touch-action: none; /* 防止手機滑動刮開時畫面跟著捲動 */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 第一關：密碼鎖定畫面 -->
+  <div class="container" id="lock-screen">
+    <div class="lock-icon">🔒</div>
+    <h1>專屬生日驚喜空間</h1>
+    <p class="subtitle">請輸入實體卡片上的 4 位數通關密碼<br>解鎖你的生日禮物</p>
+    
+    <!-- 這裡可以使用 type="tel" 讓手機自動跳出數字鍵盤 -->
+    <input type="tel" id="password-input" maxlength="4" placeholder="••••">
+    <button onclick="checkPassword()">解鎖驚喜</button>
+    <div class="error-msg" id="error-msg"></div>
+  </div>
+
+  <!-- 第二關：解鎖後的生日卡片與刮刮樂 -->
+  <div class="container" id="main-content">
+    <div class="badge">✨ HAPPY BIRTHDAY ✨</div>
+    <h1>生日快樂，我的寶貝！</h1>
+    
+    <div class="letter-box">
+      <p>親愛的：</p>
+      <br>
+      <p>很高興你順利解開了卡片上的密碼！這一年謝謝你一直陪在我身邊，不管開心或忙碌，有你在的日子都變得特別有意義。</p>
+      <br>
+      <p>希望你喜歡這份手作卡片和這個小小網頁，願你新的一歲每天都開開心心、平安健康！</p>
+      <br>
+      <p style="text-align: right; font-weight: bold;">愛你的 我 ❤️</p>
+    </div>
+
+    <!-- 刮刮樂區域 -->
+    <div class="scratch-title">👇 用手指刮開下方銀漆，領取生日大獎 👇</div>
+    <div class="scratch-container">
+      <div class="prize-text">
+        <strong>🎟️ 無條件願望兌換券 x1</strong>
+        <span>（大餐、按摩或任何你想做的事，截圖生效！）</span>
+      </div>
+      <canvas id="scratch-pad"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 🔧 你可以在這裡自訂修改設定！
+    // ==========================================
+    const SECRET_PASSWORD = "0109"; // 預設密碼，可改成你們的紀念日或她的生日
+    const ERROR_TEXT = "密碼不對喔～再仔細看看卡片上的線索吧！😜";
+    // ==========================================
+
+    function checkPassword() {
+      const input = document.getElementById('password-input').value.trim();
+      const errorMsg = document.getElementById('error-msg');
+
+      if (input === SECRET_PASSWORD) {
+        // 隱藏密碼畫面，顯示主內容
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        
+        // 噴發慶生彩帶特效
+        fireConfetti();
+        
+        // 初始化刮刮樂畫布
+        initScratchCard();
+      } else {
+        errorMsg.textContent = ERROR_TEXT;
+        // 震動輸入框提示錯誤
+        const inputEl = document.getElementById('password-input');
+        inputEl.value = '';
+        inputEl.focus();
+      }
+    }
+
+    // 支援按下 Enter 鍵送出密碼
+    document.getElementById('password-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkPassword();
+      }
+    });
+
+    // 彩帶動畫函數
+    function fireConfetti() {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    // 刮刮樂功能實作
+    function initScratchCard() {
+      const canvas = document.getElementById('scratch-pad');
+      const ctx = canvas.getContext('2d');
+      const container = canvas.parentElement;
+
+      // 設定畫布解析度符合容器大小
+      canvas.width = container.offsetWidth;
+      canvas.height = container.offsetHeight;
+
+      // 畫上銀色刮刮樂塗層
+      ctx.fillStyle = '#cccccc';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 加上提示文字
+      ctx.fillStyle = '#777777';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('✨ 刮開這裡 ✨', canvas.width / 2, canvas.height / 2);
+
+      let isDrawing = false;
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      function scratch(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 滑鼠事件（電腦測試用）
+      canvas.addEventListener('mousedown', (e
