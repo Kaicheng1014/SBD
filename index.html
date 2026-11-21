@@ -200,7 +200,31 @@
       color: #f8fafc;
     }
 
-    input[type="tel"], input[type="number"] {
+    .equation-box {
+      font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      padding: 10px 8px;
+      margin: 12px 0;
+      text-align: center;
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    .example-note {
+      font-size: 12.5px;
+      color: var(--sub);
+      background: rgba(15, 23, 42, 0.65);
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    input[type="text"], input[type="tel"], input[type="number"] {
       width: 100%;
       padding: 14px;
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
@@ -256,11 +280,39 @@
       font-weight: 500;
       margin-top: 14px;
       min-height: 20px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
     .feedback-msg.success {
       color: var(--emerald);
+    }
+
+    /* 累積式漸進提示列表 */
+    .hint-stack {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .hint-item {
+      background: rgba(244, 63, 94, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.28);
+      border-left: 3px solid var(--danger);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #fecdd3;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .hint-level {
+      font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+      font-weight: 700;
+      color: #fb7185;
+      margin-right: 4px;
     }
 
     /* 關卡 2：問答區 */
@@ -332,7 +384,7 @@
       <span class="sys-status"><span class="pulse-dot"></span>ENCRYPTED</span>
     </div>
 
-    <!-- ==================== 關卡 1：實體尋寶＋加總密碼 ==================== -->
+    <!-- ==================== 關卡 1：實體尋寶＋運算密鑰 ==================== -->
     <div id="stage-1" class="stage active">
       <div class="step-badge" id="s1-badge">PHASE 01 // FIELD RECON (1/5)</div>
       <h1 id="s1-title">現場情報搜查</h1>
@@ -355,6 +407,7 @@
       <input type="tel" id="s1-input" maxlength="6" placeholder="輸入截獲的機密數字">
       <button class="btn" onclick="verifyStage1()">驗證情報</button>
       <div class="feedback-msg" id="s1-feedback"></div>
+      <div class="hint-stack" id="s1-hint-stack"></div>
     </div>
 
     <!-- ==================== 關卡 2：10 題默契快問快答 ==================== -->
@@ -414,9 +467,34 @@
       },
       {
         header: "【最終解碼指令】",
-        text: "四組機密數字已全數截獲！<br><br>請將你收集到的四組數字<b>全部相加</b>，輸入最終總和以解除第一道安全鎖。",
-        answer: "2357",
-        wrongMsg: "加總算錯囉！提示：把上方四個格子解鎖的數字全部加起來，再按一次計算機確認看看！"
+        text: "四組機密數字已全數截獲！請在三個 <b>？</b> 處依序填入對應的運算符號（<b>+</b>、<b>-</b>、<b>*</b>、<b>/</b>），使下方算式成立：" +
+              "<div class='equation-box'>( 1222 ？ 1014 ？ 0109 ) ？ 12 = 3804</div>" +
+              "<div class='example-note'><b>範例說明：</b>若算式為 ( 10 ？ 2 ？ 3 ) ？ 4 = 44（因為 (10 - 2 + 3) × 4 = 44），則答案請輸入 <b>-+*</b></div>",
+        answers: ["-+*", "52911"],
+        isFinalOperator: true
+      }
+    ];
+
+    const FINAL_PROGRESSIVE_HINTS = [
+      {
+        threshold: 1,
+        level: "Level 0 提示：",
+        text: "請依序填入三個運算符號（+、-、*、/），並注意先計算括號內的數值。"
+      },
+      {
+        threshold: 5,
+        level: "Level 1 提示：",
+        text: "觀察等號右邊為 3804，代表括號內的計算結果必須能被 12 整除。"
+      },
+      {
+        threshold: 10,
+        level: "Level 2 提示：",
+        text: "括號內的計算結果是一個介於 300 到 350 之間的正整數，前兩個符號是一減一加。"
+      },
+      {
+        threshold: 15,
+        level: "Level 3 提示：",
+        text: "括號內需要湊出 317，試試看將 1222 減去 1014 後，再加上 0109。"
       }
     ];
 
@@ -518,28 +596,63 @@
 
     // ==================== 關卡 1 邏輯 ====================
     let s1Index = 0;
+    let finalWrongCount = 0;
+
+    function normalizeOperators(str) {
+      return str
+        .replace(/\s+/g, '')
+        .replace(/＋/g, '+')
+        .replace(/[－—–]/g, '-')
+        .replace(/[＊×xX]/g, '*')
+        .replace(/[／÷]/g, '/');
+    }
 
     function renderStage1() {
       const step = STAGE1_STEPS[s1Index];
+      const inputEl = document.getElementById('s1-input');
       document.getElementById('s1-badge').textContent = `PHASE 01 // FIELD RECON (${s1Index + 1}/5)`;
       document.getElementById('dossier-header').textContent = step.header;
       document.getElementById('dossier-text').innerHTML = step.text;
-      document.getElementById('s1-input').value = '';
+      inputEl.value = '';
       document.getElementById('s1-feedback').textContent = '';
+      document.getElementById('s1-hint-stack').innerHTML = '';
 
-      if (s1Index === 4) {
+      if (step.isFinalOperator) {
         document.getElementById('s1-title').textContent = "最終密鑰合成";
-        document.getElementById('s1-subtitle').textContent = "將截獲的四組數字相加，解除第一道安全鎖";
-        document.getElementById('s1-input').placeholder = "輸入加總後的 4 位數";
+        document.getElementById('s1-subtitle').textContent = "填入三個運算符號使算式成立，解除第一道安全鎖";
+        inputEl.type = "text";
+        inputEl.maxLength = 8;
+        inputEl.placeholder = "輸入 3 個運算符號（如 -+*）";
+      } else {
+        inputEl.type = "tel";
+        inputEl.maxLength = 6;
+        inputEl.placeholder = "輸入截獲的機密數字";
       }
     }
 
+    function appendProgressiveHint(hintObj) {
+      const stack = document.getElementById('s1-hint-stack');
+      const item = document.createElement('div');
+      item.className = 'hint-item';
+      item.innerHTML = `<span class="hint-level">${hintObj.level}</span>${hintObj.text}`;
+      stack.appendChild(item);
+    }
+
     function verifyStage1() {
-      const val = document.getElementById('s1-input').value.trim();
+      const inputEl = document.getElementById('s1-input');
+      const rawVal = inputEl.value.trim();
       const step = STAGE1_STEPS[s1Index];
       const feedback = document.getElementById('s1-feedback');
 
-      if (val === step.answer) {
+      let isMatch = false;
+      if (step.isFinalOperator) {
+        const userVal = normalizeOperators(rawVal);
+        isMatch = step.answers.includes(userVal);
+      } else {
+        isMatch = (rawVal === step.answer);
+      }
+
+      if (isMatch) {
         if (s1Index < 4) {
           const slot = document.getElementById(`slot-${s1Index}`);
           slot.textContent = `#0${s1Index + 1}: ${step.answer}`;
@@ -557,8 +670,16 @@
           renderQuiz();
         }
       } else {
-        feedback.textContent = step.wrongMsg;
-        const inputEl = document.getElementById('s1-input');
+        if (step.isFinalOperator) {
+          finalWrongCount++;
+          feedback.textContent = "密鑰驗證失敗，請參考下方線索提示：";
+          const unlockedHint = FINAL_PROGRESSIVE_HINTS.find(h => h.threshold === finalWrongCount);
+          if (unlockedHint) {
+            appendProgressiveHint(unlockedHint);
+          }
+        } else {
+          feedback.textContent = step.wrongMsg;
+        }
         inputEl.value = '';
         inputEl.focus();
       }
@@ -581,110 +702,4 @@
       const guessBox = document.getElementById('guess-box');
       const feedback = document.getElementById('quiz-feedback');
 
-      document.getElementById('quiz-progress').textContent = `PHASE 02 // IDENTITY SYNC (${qIndex + 1}/${total})`;
-      document.getElementById('quiz-question').textContent = q.question;
-      feedback.textContent = '';
-      feedback.className = 'feedback-msg';
-      optionsBox.innerHTML = '';
-
-      if (q.type === 'guessNumber') {
-        optionsBox.style.display = 'none';
-        guessBox.style.display = 'block';
-        currentMin = q.min;
-        currentMax = q.max;
-        guessCount = 0;
-        document.getElementById('guess-range').textContent = `RANGE : ${currentMin} ～ ${currentMax} HRS`;
-        document.getElementById('guess-input').value = '';
-        return;
-      }
-
-      optionsBox.style.display = 'flex';
-      guessBox.style.display = 'none';
-      let fifthSpawned = false;
-
-      q.options.forEach((optText, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = optText;
-
-        btn.onclick = () => {
-          if (q.type === 'choice') {
-            if (idx === q.answer) {
-              nextQuiz();
-            } else {
-              feedback.textContent = q.wrongMsg;
-            }
-          } else if (q.type === 'spawn5th') {
-            feedback.textContent = q.triggerMsg;
-            if (!fifthSpawned) {
-              fifthSpawned = true;
-              const fifthBtn = document.createElement('button');
-              fifthBtn.className = 'option-btn bonus-opt';
-              fifthBtn.textContent = q.fifthOption;
-              fifthBtn.onclick = () => nextQuiz();
-              optionsBox.appendChild(fifthBtn);
-            }
-          } else if (q.type === 'allCorrect') {
-            feedback.className = 'feedback-msg success';
-            feedback.textContent = q.successMsg;
-            setTimeout(() => nextQuiz(), 1200);
-          }
-        };
-
-        optionsBox.appendChild(btn);
-      });
-    }
-
-    function submitGuess() {
-      const q = STAGE2_QUIZZES[qIndex];
-      const inputEl = document.getElementById('guess-input');
-      const val = parseInt(inputEl.value, 10);
-      const feedback = document.getElementById('quiz-feedback');
-
-      if (isNaN(val) || val < currentMin || val > currentMax) {
-        feedback.textContent = `請輸入 ${currentMin} 到 ${currentMax} 之間的數字喔！`;
-        return;
-      }
-
-      guessCount++;
-
-      if (val === q.targetNumber) {
-        feedback.className = 'feedback-msg success';
-        feedback.textContent = `答對了！總共花了 ${q.targetNumber} 小時（你猜了 ${guessCount} 次）🎉`;
-        setTimeout(() => nextQuiz(), 1300);
-      } else if (val > q.targetNumber) {
-        currentMax = val;
-        document.getElementById('guess-range').textContent = `RANGE : ${currentMin} ～ ${currentMax} HRS`;
-        feedback.textContent = `太大了！沒那麼誇張啦，再猜小一點 ⬇️`;
-        inputEl.value = '';
-        inputEl.focus();
-      } else {
-        currentMin = val;
-        document.getElementById('guess-range').textContent = `RANGE : ${currentMin} ～ ${currentMax} HRS`;
-        feedback.textContent = `太小了！我寫得很認真耶，再猜大一點 ⬆️`;
-        inputEl.value = '';
-        inputEl.focus();
-      }
-    }
-
-    document.getElementById('guess-input').addEventListener('keypress', e => {
-      if (e.key === 'Enter') submitGuess();
-    });
-
-    function nextQuiz() {
-      qIndex++;
-      if (qIndex < STAGE2_QUIZZES.length) {
-        renderQuiz();
-      } else {
-        if (typeof confetti === 'function') {
-          confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
-        }
-        showStage(3);
-      }
-    }
-
-    // 初始化第一關
-    renderStage1();
-  </script>
-</body>
-</html>
+      document.getElementById('quiz-progress').textContent = 
