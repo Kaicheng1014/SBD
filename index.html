@@ -476,7 +476,7 @@
         header: "【最終解碼指令】",
         text: "四組機密數字已全數截獲！請在三個 <b>？</b> 處依序填入對應的運算符號（<b>+</b>、<b>-</b>、<b>*</b>、<b>/</b>），使下方算式成立：" +
               "<div class='equation-box'>( 1222 ？ 1014 ？ 0109 ) ？ 12 = 3804</div>" +
-              "<div class='example-note'><b>範例說明：</b>若算式為 ( 10 ？ 2 ？ 3 ) ？ 4 = 44（因為 (10 - 2 + 3) × 4 = 44），則答案請輸入 <b>-+*</b></div>",
+              "<div class='example-note'><b>範例說明：</b>若算式為 ( 10 ？ 5 ？ 2 ) ？ 3 = 17（因為 (10 + 5 × 2) - 3 = 17），則答案請輸入 <b>+*-</b></div>",
         answers: ["-+*", "52911"],
         isFinalOperator: true
       }
@@ -497,11 +497,6 @@
         threshold: 10,
         level: "Level 2 提示：",
         text: "括號內的計算結果是一個介於 300 到 350 之間的正整數，前兩個符號是一減一加。"
-      },
-      {
-        threshold: 15,
-        level: "Level 3 提示：",
-        text: "括號內需要湊出 317，試試看將 1222 減去 1014 後，再加上 0109。"
       }
     ];
 
@@ -626,7 +621,7 @@
         document.getElementById('s1-subtitle').textContent = "填入三個運算符號使算式成立，解除第一道安全鎖";
         inputEl.setAttribute('inputmode', 'text');
         inputEl.maxLength = 8;
-        inputEl.placeholder = "點此輸入符號（如 -+*）";
+        inputEl.placeholder = "點此輸入符號（如 +*-）";
       } else {
         inputEl.setAttribute('inputmode', 'numeric');
         inputEl.maxLength = 6;
