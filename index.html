@@ -46,7 +46,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 20px 14px 80px;
+      padding: 20px 14px 90px;
     }
 
     .container {
@@ -272,6 +272,7 @@
     .code-input.danger-input {
       border-color: rgba(244, 63, 94, 0.6);
       color: #fb7185;
+      letter-spacing: 6px;
     }
 
     .code-input.danger-input:focus {
@@ -526,7 +527,7 @@
 
     .duel-btn-area {
       position: relative;
-      min-height: 125px;
+      min-height: 135px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -541,22 +542,26 @@
       font-size: 14.5px;
       color: var(--sub);
       cursor: pointer;
-      transition: top 0.18s ease, left 0.18s ease, background 0.2s, color 0.2s;
+      transition: top 0.16s ease, left 0.16s ease, transform 0.16s ease, background 0.2s, color 0.2s;
     }
 
+    /* 逃跑狀態：允許跑出格子外圍並歪斜，營造破圖 Bug 感 */
     .runaway-btn.escaped {
       position: absolute;
       width: auto;
-      padding: 10px 16px;
-      z-index: 20;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
-      border-color: rgba(244, 63, 94, 0.5);
+      padding: 11px 18px;
+      z-index: 30;
+      background: #0f172a;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.8);
+      border-color: rgba(244, 63, 94, 0.55);
       color: #fda4af;
+      white-space: nowrap;
     }
 
     .runaway-btn.surrendered {
       position: static;
       width: 100%;
+      transform: none !important;
       background: linear-gradient(135deg, #10b981, #059669);
       border-color: rgba(110, 231, 183, 0.5);
       color: #ffffff;
@@ -632,7 +637,7 @@
           <button type="button" class="btn" id="gacha-stop-btn">停止抽獎</button>
         </div>
 
-        <!-- 第二幕：額度溢位 -> 系統過載警報（需現場工程師輸入 52911 解鎖） -->
+        <!-- 第二幕：額度溢位 -> 系統過載警報（工程師隱碼輸入 52911 解鎖） -->
         <div id="gacha-step-2" style="display: none;">
           <div class="overload-alert-box">
             <div class="overload-title">⚠️ CRITICAL SYSTEM OVERLOAD</div>
@@ -641,11 +646,11 @@
               <b>唯一緊急冷卻方式：</b>請立刻轉頭親現場工程師一口，並由工程師輸入授權碼以解除警報！
             </div>
           </div>
-          <input type="text" inputmode="numeric" id="engineer-code-input" class="code-input danger-input" maxlength="8" autocomplete="off" placeholder="請現場工程師輸入授權碼">
+          <input type="password" inputmode="numeric" id="engineer-code-input" class="code-input danger-input" maxlength="8" autocomplete="new-password" placeholder="請現場工程師輸入授權碼">
           <button type="button" class="btn danger-btn" id="kiss-unlock-btn">授權解除警報</button>
         </div>
 
-        <!-- 第三幕：恢復正常 -> 獎勵縮水 + 逃跑按鈕 -->
+        <!-- 第三幕：恢復正常 -> 獎勵縮水 + 逃跑 10 次按鈕 -->
         <div id="gacha-step-3" style="display: none;">
           <div class="final-reward-card">
             <div class="final-reward-tag">ALARM CLEARED // OVERFLOW FIXED</div>
@@ -1087,7 +1092,7 @@
       }, 1100);
     });
 
-    // 驗證工程師手動輸入授權碼 52911 -> 解除警報 -> 獎勵縮水 + 逃跑按鈕
+    // 驗證工程師手動輸入授權碼 52911 -> 解除警報 -> 獎勵縮水 + 逃跑 10 次按鈕
     function verifyEngineerOverride() {
       const codeInput = document.getElementById('engineer-code-input');
       const feedback = document.getElementById('quiz-feedback');
@@ -1109,6 +1114,7 @@
         runawayBtn.className = 'runaway-btn';
         runawayBtn.style.top = '';
         runawayBtn.style.left = '';
+        runawayBtn.style.transform = '';
         runawayBtn.textContent = '抗議！我全都要';
       } else {
         feedback.textContent = "授權碼錯誤！請先完成任務並請現場工程師輸入正確授權碼。";
@@ -1129,9 +1135,9 @@
       nextQuiz();
     });
 
-    // 抗議按鈕逃跑 3 次後變成「好啦我接受」
+    // 抗議按鈕逃跑 10 次（可跑出格子＋歪斜破圖 Bug 感），第 10 次變成「好啦我接受」
     document.getElementById('runaway-protest-btn').addEventListener('click', function () {
-      if (escapeCount >= 3) {
+      if (escapeCount >= 10) {
         nextQuiz();
         return;
       }
@@ -1139,22 +1145,36 @@
       escapeCount++;
       const feedback = document.getElementById('quiz-feedback');
 
-      if (escapeCount < 3) {
+      if (escapeCount < 10) {
         this.classList.add('escaped');
         const area = document.getElementById('duel-btn-area');
-        const maxLeft = Math.max(10, area.clientWidth - 150);
-        const randomLeft = Math.floor(Math.random() * maxLeft);
-        const randomTop = 58 + Math.floor(Math.random() * 45);
+        // 允許左右超出容器一點點（-28px 到 area.clientWidth - 110px）並隨機傾斜角度
+        const randomLeft = -28 + Math.floor(Math.random() * Math.max(80, area.clientWidth - 80));
+        const randomTop = 48 + Math.floor(Math.random() * 85);
+        const randomDeg = -14 + Math.floor(Math.random() * 29);
+
         this.style.left = `${randomLeft}px`;
         this.style.top = `${randomTop}px`;
-        feedback.textContent = escapeCount === 1
-          ? "系統偵測到抗議訊號，按鈕已啟動迴避模式 😜"
-          : "抓不到～剛剛親一下只夠解鎖一個願望喔！";
+        this.style.transform = `rotate(${randomDeg}deg)`;
+
+        const tauntMsgs = [
+          "系統偵測到抗議訊號，按鈕已啟動迴避模式 😜",
+          "抓不到～剛剛親一下只夠解鎖一個願望喔！",
+          "警告：UI 元件座標發生異常偏移...",
+          "還在點！你以為多點幾次它就會屈服嗎？",
+          "按鈕：我滑～我再滑～",
+          "系統提示：這不是 Bug，是工程師的堅持",
+          "快點到了嗎？還差一點點喔 😏",
+          "手速不錯，但按鈕已經跑出框框外面了！",
+          "最後一次機會，再按一下看看會發生什麼事！"
+        ];
+        feedback.textContent = tauntMsgs[escapeCount - 1];
       } else {
         this.classList.remove('escaped');
         this.classList.add('surrendered');
         this.style.top = '';
         this.style.left = '';
+        this.style.transform = '';
         this.textContent = '好啦我接受';
         feedback.textContent = '';
       }
