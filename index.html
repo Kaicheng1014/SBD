@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>生日尋寶大作戰 🎁</title>
+  <title>生日尋寶行動 · 機密檔案</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
@@ -15,6 +15,8 @@
       --accent: #f3e5e7;
       --text: #4a3f3d;
       --sub: #8c7b78;
+      --dossier-bg: #faf5f2;
+      --dossier-border: #e6d2ce;
     }
 
     * {
@@ -47,7 +49,7 @@
 
     .stage {
       display: none;
-      animation: fadeIn 0.45s ease forwards;
+      animation: fadeIn 0.4s ease forwards;
     }
 
     .stage.active {
@@ -57,7 +59,7 @@
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(10px);
       }
 
       to {
@@ -75,6 +77,7 @@
       padding: 5px 12px;
       border-radius: 20px;
       margin-bottom: 14px;
+      letter-spacing: 0.5px;
     }
 
     h1 {
@@ -85,21 +88,72 @@
     .subtitle {
       font-size: 14px;
       color: var(--sub);
-      margin-bottom: 22px;
+      margin-bottom: 20px;
       line-height: 1.5;
     }
 
-    input[type="tel"] {
+    /* 偵探線索檔案框 */
+    .dossier-box {
+      background: var(--dossier-bg);
+      border: 1.5px dashed var(--dossier-border);
+      border-radius: 16px;
+      padding: 18px 16px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .dossier-header {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .dossier-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* 已收集數字進度條 */
+    .collected-bar {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .code-slot {
+      flex: 1;
+      padding: 8px 4px;
+      background: #f5ecea;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--sub);
+      border: 1px solid #eedcd9;
+    }
+
+    .code-slot.unlocked {
+      background: #fcebed;
+      color: var(--primary-dark);
+      border-color: var(--primary);
+    }
+
+    input[type="tel"],
+    input[type="number"] {
       width: 100%;
       padding: 14px;
       font-size: 20px;
       text-align: center;
-      letter-spacing: 6px;
+      letter-spacing: 4px;
       border: 2px solid #eedcd9;
       border-radius: 12px;
       outline: none;
       margin-bottom: 14px;
       color: var(--text);
+      transition: border-color 0.2s;
     }
 
     input:focus {
@@ -124,20 +178,26 @@
       background-color: var(--primary-dark);
     }
 
-    .error-msg {
+    .feedback-msg {
       color: #e05252;
-      font-size: 13px;
-      margin-top: 10px;
-      min-height: 18px;
+      font-size: 13.5px;
+      font-weight: 500;
+      margin-top: 12px;
+      min-height: 20px;
+      line-height: 1.4;
     }
 
-    /* 第二關：問答選項 */
+    .feedback-msg.success {
+      color: #388e3c;
+    }
+
+    /* 關卡 2：問答區 */
     .quiz-q {
       font-size: 17px;
       font-weight: bold;
       margin-bottom: 18px;
-      line-height: 1.5;
-      color: var(--text);
+      line-height: 1.55;
+      text-align: left;
     }
 
     .options-list {
@@ -157,6 +217,7 @@
       text-align: left;
       cursor: pointer;
       transition: all 0.2s;
+      line-height: 1.4;
     }
 
     .option-btn:active {
@@ -164,117 +225,25 @@
       border-color: var(--primary);
     }
 
-    /* 第三關：記憶翻牌遊戲 */
-    .memory-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 16px 0;
-    }
-
-    .card-item {
-      aspect-ratio: 1 / 1;
-      background: var(--primary);
-      border-radius: 14px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 32px;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.25s, background-color 0.25s;
-      color: transparent;
-      box-shadow: 0 4px 10px rgba(217, 119, 127, 0.2);
-    }
-
-    .card-item::after {
-      content: "?";
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .card-item.flipped,
-    .card-item.matched {
-      background: #faf5f2;
-      border: 2px solid #eedcd9;
-      color: var(--text);
-      transform: rotateY(180deg);
-    }
-
-    .card-item.flipped::after,
-    .card-item.matched::after {
-      content: none;
-    }
-
-    .card-item.matched {
-      background: #fcebed;
+    .option-btn.bonus-opt {
+      background: #fff0f2;
       border-color: var(--primary);
+      color: var(--primary-dark);
+      font-weight: bold;
+      animation: fadeIn 0.35s ease;
     }
 
-    /* 第四關：最終線索區 */
-    .clue-box {
+    /* 關卡 2 第 9 題：終極密碼範圍提示 */
+    .range-badge {
+      display: inline-block;
       background: #faf5f2;
-      border: 2px dashed var(--primary);
-      border-radius: 16px;
-      padding: 20px 16px;
-      margin: 18px 0;
-      text-align: left;
-    }
-
-    .clue-title {
-      font-size: 14px;
+      border: 1.5px solid #eedcd9;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 15px;
       font-weight: bold;
       color: var(--primary-dark);
-      margin-bottom: 8px;
-    }
-
-    .clue-text {
-      font-size: 16px;
-      line-height: 1.7;
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .scratch-wrap {
-      position: relative;
-      width: 100%;
-      height: 110px;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-top: 14px;
-      user-select: none;
-    }
-
-    .secret-spot {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, #fff0f1 0%, #ffe3e6 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-    }
-
-    .secret-spot strong {
-      font-size: 17px;
-      color: var(--primary-dark);
-    }
-
-    .secret-spot span {
-      font-size: 12px;
-      color: var(--sub);
-      margin-top: 4px;
-    }
-
-    canvas#scratch-pad {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-      cursor: pointer;
+      margin-bottom: 16px;
     }
   </style>
 </head>
@@ -282,267 +251,360 @@
 <body>
 
   <div class="container">
-    <!-- 關卡 1：密碼啟動 -->
+    <!-- ==================== 關卡 1：實體尋寶＋加總密碼 ==================== -->
     <div id="stage-1" class="stage active">
-      <div class="step-badge">STAGE 1 / 3 · 啟動任務</div>
-      <h1>生日尋寶系統 🔒</h1>
-      <p class="subtitle">生日快樂！實體卡片被我藏起來了<br>請先輸入 4 位數通關密碼啟動線索</p>
-      <input type="tel" id="pwd-input" maxlength="4" placeholder="••••">
-      <button class="btn" onclick="checkPassword()">驗證密碼</button>
-      <div id="pwd-error" class="error-msg"></div>
-    </div>
+      <div class="step-badge" id="s1-badge">STAGE 1 / 3 · 現場情報搜查 (1/5)</div>
+      <h1 id="s1-title">實體線索追蹤 🔍</h1>
+      <p class="subtitle" id="s1-subtitle">卡片已被安全封存，請依照情報找出四組機密數字</p>
 
-    <!-- 關卡 2：默契快問快答 -->
-    <div id="stage-2" class="stage">
-      <div class="step-badge" id="quiz-progress">STAGE 2 / 3 · 默契考驗 (1/3)</div>
-      <h1>答對全部才能前進！</h1>
-      <p class="subtitle">測試一下你對我們的記憶力</p>
-      <div id="quiz-question" class="quiz-q"></div>
-      <div id="quiz-options" class="options-list"></div>
-      <div id="quiz-error" class="error-msg"></div>
-    </div>
-
-    <!-- 關卡 3：記憶翻牌挑戰 -->
-    <div id="stage-3" class="stage">
-      <div class="step-badge">STAGE 3 / 3 · 最終考驗</div>
-      <h1>配對所有生日元素 🎂</h1>
-      <p class="subtitle">找出全部 6 組相同的圖案，解鎖藏寶地點！</p>
-      <div id="memory-grid" class="memory-grid"></div>
-    </div>
-
-    <!-- 最終通關：藏寶線索 -->
-    <div id="stage-4" class="stage">
-      <div class="step-badge">🎉 MISSION COMPLETE 🎉</div>
-      <h1>恭喜通關！生日快樂 ❤️</h1>
-      <p class="subtitle">你成功解開所有謎題，快去把卡片找出來吧！</p>
-
-      <div class="clue-box">
-        <div class="clue-title">📍 尋寶線索提示：</div>
-        <div class="clue-text" id="clue-description"></div>
-
-        <div class="scratch-wrap">
-          <div class="secret-spot">
-            <strong id="final-location"></strong>
-            <span id="final-sub"></span>
-          </div>
-          <canvas id="scratch-pad"></canvas>
-        </div>
+      <!-- 4組數字收集進度 -->
+      <div class="collected-bar">
+        <div class="code-slot" id="slot-0">#01 ?</div>
+        <div class="code-slot" id="slot-1">#02 ?</div>
+        <div class="code-slot" id="slot-2">#03 ?</div>
+        <div class="code-slot" id="slot-3">#04 ?</div>
       </div>
+
+      <!-- 偵探線索框 -->
+      <div class="dossier-box">
+        <div class="dossier-header" id="dossier-header">【線索檔案 #01】</div>
+        <div class="dossier-text" id="dossier-text"></div>
+      </div>
+
+      <input type="tel" id="s1-input" maxlength="6" placeholder="輸入截獲的數字">
+      <button class="btn" onclick="verifyStage1()">提交情報</button>
+      <div class="feedback-msg" id="s1-feedback"></div>
+    </div>
+
+    <!-- ==================== 關卡 2：10 題默契快問快答 ==================== -->
+    <div id="stage-2" class="stage">
+      <div class="step-badge" id="quiz-progress">STAGE 2 / 3 · 默契驗證 (1/10)</div>
+      <div id="quiz-question" class="quiz-q"></div>
+
+      <!-- 選擇題容器 -->
+      <div id="quiz-options" class="options-list"></div>
+
+      <!-- 第 9 題終極密碼專用容器 -->
+      <div id="guess-box" style="display: none;">
+        <div class="range-badge" id="guess-range">目前範圍：1 ～ 100 小時</div>
+        <input type="number" id="guess-input" placeholder="輸入小時數">
+        <button class="btn" onclick="submitGuess()">送出猜測</button>
+      </div>
+
+      <div class="feedback-msg" id="quiz-feedback"></div>
+    </div>
+
+    <!-- ==================== 關卡 3 預留過渡畫面 ==================== -->
+    <div id="stage-3" class="stage">
+      <div class="step-badge">STAGE 2 COMPLETE ✅</div>
+      <h1>默契考驗全數通過！</h1>
+      <p class="subtitle">你已經解開前兩道關卡，準備好進入「合照時間軸」與「最終藏寶線索」了嗎？（待我們確認後接續實作）</p>
     </div>
   </div>
 
   <script>
     // =========================================================
-    // 🔧 【自訂設定區】只需修改這裡的內容即可！
+    // 🔧 【自訂設定區】
     // =========================================================
-    const CONFIG = {
-      // 1. 第一關密碼（4位數字）
-      password: "0109",
-      passwordHint: "密碼不對喔～提示：你的生日或我們的紀念日！",
+    const STAGE1_STEPS = [
+      {
+        header: "【線索檔案 #01】",
+        text: "目標物為圓弧形防護裝備，配有可掀式透明護罩與軟墊內襯，平時駐守於玄關或車廂附近，專門在移動時替你擋風並保護頭部。<br><br>請前往該裝備內部進行搜查，取得第一組機密數字。",
+        answer: "1014",
+        wrongMsg: "情報不符！請確認安全帽內部的紙條數字。"
+      },
+      {
+        header: "【線索檔案 #02】",
+        text: "牠們身上烙印著 <b>2021 至 2024</b> 的四座王者印記，且領頭者背負著 <b>No. 1</b> 編號。<br><br>情報顯示，第二組數字就潛伏在牠們的「正後方盲區」。",
+        answer: "1222",
+        wrongMsg: "數字不對喔，再仔細看看冠軍車組正後方的紙條！"
+      },
+      {
+        header: "【線索檔案 #03】",
+        text: "目標位於虛擬賽道的駕駛艙最深處——在「視線正下方」的黑暗地帶，那裡並列著三組金屬控制板，分別掌管著「加速」、「減速」與「動力銜接」。<br><br>情報顯示，第三組數字就潛伏在這三組足部控制裝置的「側邊角落」。",
+        answer: "0109",
+        wrongMsg: "情報錯誤！請檢查踏板側邊角落的紙條。"
+      },
+      {
+        header: "【線索檔案 #04】",
+        text: "最後一組數字並未藏在紙條裡，而是直接暴露在空氣中。<br><br>請暫停腳步、抬頭環顧一下四周環境——線索就掛在最顯眼的地方，正靜靜地看著你。",
+        answer: "12",
+        wrongMsg: "不對喔，抬頭看看顯眼處掛著的數字！"
+      },
+      {
+        header: "【最終解碼指令】",
+        text: "四組機密數字已全數截獲！<br><br>請將你收集到的四組數字<b>全部相加</b>，輸入最終總和以解除第一道安全鎖。",
+        answer: "2357",
+        wrongMsg: "加總算錯囉！提示：1014 + 1222 + 0109 + 12 = ?"
+      }
+    ];
 
-      // 2. 第二關默契問答（可自由增減題目，answer 為正確選項的索引值 0, 1, 2...）
-      quizzes: [
-        {
-          question: "Q1. 我們第一次一起去吃飯／約會的地方是哪裡？",
-          options: ["夜市撈金魚", "電影院看恐怖片", "咖啡廳聊天"],
-          answer: 2, // 0代表第一個選項，1代表第二個，2代表第三個
-          wrongTip: "再想一下！提示：那天有喝飲料喔～"
-        },
-        {
-          question: "Q2. 我平常最常對你說的一句話是什麼？",
-          options: ["你今天好漂亮", "快去睡覺不要熬夜", "等一下要吃什麼"],
-          answer: 2,
-          wrongTip: "不對喔，每天到了飯點我都會問這句！"
-        },
-        {
-          question: "Q3. 今天是你幾歲（或我們在一起第幾年）的特別日子？",
-          options: ["永遠的 18 歲", "24 歲生日快樂", "3 歲小朋友"],
-          answer: 1,
-          wrongTip: "雖然你很可愛，但請選真實數字啦 😜"
-        }
-      ],
-
-      // 3. 第三關翻牌圖示（固定 6 種 emoji，系統會自動複製成 12 張洗牌）
-      cardEmojis: ["🎂", "🎁", "❤️", "🧸", "🥂", "✨"],
-
-      // 4. 通關後的藏寶線索（文字提示 + 刮刮樂揭曉最終位置）
-      clueHint: "線索就在我們最常待著的空間裡，往「每天出門前一定會看的地方」或「軟綿綿的角落」找找看！刮開下方查看確切位置 👇",
-      finalSpotTitle: "🛏️ 臥室床頭櫃的第二個抽屜裡！",
-      finalSpotSub: "（找到卡片後記得回來找我領生日擁抱 ❤️）"
-    };
+    // 關卡 2：10 題題庫設定（可依需求微調文字）
+    const STAGE2_QUIZZES = [
+      {
+        type: "choice",
+        question: "Q1. 還記得我們「第一次談話」時，聊到的第一個話題是什麼嗎？",
+        options: ["某堂課／學校的事情", "今天天氣很好", "你的穿搭很好看", "要不要一起去吃飯"],
+        answer: 0, // 0=第一個選項，可依真實情況修改選項文字與 answer 索引
+        wrongMsg: "再想一下！我們剛認識時是從什麼話題開啟對話的？"
+      },
+      {
+        type: "spawn5th", // 特殊機關：點前4個任一個都會跳出提示並生出第5個選項
+        question: "Q2. 我平常最常對你說的一句話是什麼？",
+        options: [
+          "你今天好漂亮",
+          "等一下要吃什麼",
+          "多喝水早點睡覺",
+          "走，去運動了！"
+        ],
+        triggerMsg: "欸 好像不是歐 😜",
+        fifthOption: "以上皆是，但其實我最常說的是：寶貝我愛你 ❤️"
+      },
+      {
+        type: "choice",
+        question: "Q3. 考考你的計算能力！從我們在一起那天（2022/01/09）算到今天（2026/12/22），總共過了幾天？",
+        options: ["1,796 天", "1,807 天", "1,808 天", "1,825 天"],
+        answer: 2,
+        wrongMsg: "差一點點！別忘了 2024 年是閏年，2 月有 29 天喔！"
+      },
+      {
+        type: "choice",
+        question: "Q4. 假設我們每週一起運動 2 次，扣掉出國或偷懶大約 20 週，這將近 5 年（約 258 週）下來，我們大概一起流汗運動了幾次？",
+        options: ["約 238 次", "約 476 次", "約 516 次", "多到數不清"],
+        answer: 1,
+        wrongMsg: "提示：(258 - 20) × 2 = ?"
+      },
+      {
+        type: "choice",
+        question: "Q5. 把「你的生日月份（10）」加上「我的生日日期（14）」後，再乘以「我們在一起的週年數（5）」，會得到哪個數字？",
+        options: ["110", "120", "125", "140"],
+        answer: 1,
+        wrongMsg: "再心算一次：(10 + 14) × 5"
+      },
+      {
+        type: "choice",
+        question: "Q6. 每次我們一起去吃飯或點餐時，下列哪一件事最符合我的習慣？",
+        options: ["一定會把最後一口好料的留給你", "永遠點最辣的口味", "每次都不點飲料", "吃飯速度比你慢兩倍"],
+        answer: 0,
+        wrongMsg: "再選一次～哪個才是我對你的日常習慣？"
+      },
+      {
+        type: "choice",
+        question: "Q7. 我們一起出去玩或出國旅行時，誰比較常負責規劃路線與看地圖？",
+        options: ["當然是你這個超強導航", "兩個人一起看一起迷路", "完全不看地圖隨便走", "靠路人指路"],
+        answer: 0,
+        wrongMsg: "這題送分題還選錯！再給你一次機會 😜"
+      },
+      {
+        type: "allCorrect", // 特殊機關：4個全對的暖心題
+        question: "Q8. 下面哪一件事情，其實是我「偷偷記在心裡」但平常很少掛在嘴邊的？",
+        options: [
+          "你生理期快來時不能喝冰的",
+          "你隨口提過想去的地方或想吃的東西",
+          "你每次認真陪我練英文、聽我分享瑣事的樣子",
+          "你累的時候撒嬌想睡覺的表情"
+        ],
+        successMsg: "答對了！其實這四件事我全都記在心裡 ❤️"
+      },
+      {
+        type: "guessNumber", // 特殊機關：終極密碼猜小時數
+        question: "Q9. 猜猜看，籌備這次的生日驚喜與網頁，我總共花了多少小時寫程式與測試？",
+        targetNumber: 36, // 🔧 在這裡設定正確小時數（1 ~ 100 之間）
+        min: 1,
+        max: 100
+      },
+      {
+        type: "spawn5th", // 第 10 題：選單一願望被退回，解鎖全包選項
+        question: "Q10. 最後一題！通關後你最想用這張實體卡片兌換什麼？",
+        options: [
+          "一頓豪華生日大餐",
+          "專屬按摩服務 30 分鐘",
+          "無條件答應一個願望",
+          "陪我逛街一整天不喊累"
+        ],
+        triggerMsg: "太客氣了吧！生日怎麼可以只選一個？再看一次選項 👇",
+        fifthOption: "✨ 以上全部都要，我全包了！ ✨"
+      }
+    ];
     // =========================================================
 
-    // 切換關卡畫面
+    // 切換主階段
     function showStage(num) {
       document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
       document.getElementById(`stage-${num}`).classList.add('active');
     }
 
-    // --- 關卡 1 邏輯 ---
-    function checkPassword() {
-      const val = document.getElementById('pwd-input').value.trim();
-      if (val === CONFIG.password) {
-        showStage(2);
-        renderQuiz();
-      } else {
-        document.getElementById('pwd-error').textContent = CONFIG.passwordHint;
-        const input = document.getElementById('pwd-input');
-        input.value = '';
-        input.focus();
+    // ==================== 關卡 1 邏輯 ====================
+    let s1Index = 0;
+
+    function renderStage1() {
+      const step = STAGE1_STEPS[s1Index];
+      document.getElementById('s1-badge').textContent = `STAGE 1 / 3 · 現場情報搜查 (${s1Index + 1}/5)`;
+      document.getElementById('dossier-header').textContent = step.header;
+      document.getElementById('dossier-text').innerHTML = step.text;
+      document.getElementById('s1-input').value = '';
+      document.getElementById('s1-feedback').textContent = '';
+
+      if (s1Index === 4) {
+        document.getElementById('s1-title').textContent = "最終密碼合成 🔐";
+        document.getElementById('s1-subtitle').textContent = "請將四組數字相加，解除安全鎖";
+        document.getElementById('s1-input').placeholder = "輸入加總後的 4 位數";
       }
     }
 
-    document.getElementById('pwd-input').addEventListener('keypress', e => {
-      if (e.key === 'Enter') checkPassword();
+    function verifyStage1() {
+      const val = document.getElementById('s1-input').value.trim();
+      const step = STAGE1_STEPS[s1Index];
+      const feedback = document.getElementById('s1-feedback');
+
+      if (val === step.answer) {
+        // 更新上方收集格子
+        if (s1Index < 4) {
+          const slot = document.getElementById(`slot-${s1Index}`);
+          slot.textContent = `#0${s1Index + 1}: ${step.answer}`;
+          slot.classList.add('unlocked');
+        }
+
+        s1Index++;
+        if (s1Index < STAGE1_STEPS.length) {
+          renderStage1();
+        } else {
+          // 關卡 1 全部通過，進入關卡 2
+          if (typeof confetti === 'function') {
+            confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+          }
+          showStage(2);
+          renderQuiz();
+        }
+      } else {
+        feedback.textContent = step.wrongMsg;
+        const inputEl = document.getElementById('s1-input');
+        inputEl.value = '';
+        inputEl.focus();
+      }
+    }
+
+    document.getElementById('s1-input').addEventListener('keypress', e => {
+      if (e.key === 'Enter') verifyStage1();
     });
 
-    // --- 關卡 2 邏輯 ---
-    let currentQuizIdx = 0;
+    // ==================== 關卡 2 邏輯 ====================
+    let qIndex = 0;
+    let currentMin = 1;
+    let currentMax = 100;
+    let guessCount = 0;
 
     function renderQuiz() {
-      const total = CONFIG.quizzes.length;
-      const q = CONFIG.quizzes[currentQuizIdx];
-      document.getElementById('quiz-progress').textContent = `STAGE 2 / 3 · 默契考驗 (${currentQuizIdx + 1}/${total})`;
-      document.getElementById('quiz-question').textContent = q.question;
-      document.getElementById('quiz-error').textContent = '';
-
+      const q = STAGE2_QUIZZES[qIndex];
+      const total = STAGE2_QUIZZES.length;
       const optionsBox = document.getElementById('quiz-options');
+      const guessBox = document.getElementById('guess-box');
+      const feedback = document.getElementById('quiz-feedback');
+
+      document.getElementById('quiz-progress').textContent = `STAGE 2 / 3 · 默契驗證 (${qIndex + 1}/${total})`;
+      document.getElementById('quiz-question').textContent = q.question;
+      feedback.textContent = '';
+      feedback.className = 'feedback-msg';
       optionsBox.innerHTML = '';
+
+      if (q.type === 'guessNumber') {
+        optionsBox.style.display = 'none';
+        guessBox.style.display = 'block';
+        currentMin = q.min;
+        currentMax = q.max;
+        guessCount = 0;
+        document.getElementById('guess-range').textContent = `目前範圍：${currentMin} ～ ${currentMax} 小時`;
+        document.getElementById('guess-input').value = '';
+        return;
+      }
+
+      optionsBox.style.display = 'flex';
+      guessBox.style.display = 'none';
+      let fifthSpawned = false;
 
       q.options.forEach((optText, idx) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.textContent = optText;
-        btn.onclick = () => handleQuizAnswer(idx);
+
+        btn.onclick = () => {
+          if (q.type === 'choice') {
+            if (idx === q.answer) {
+              nextQuiz();
+            } else {
+              feedback.textContent = q.wrongMsg;
+            }
+          } else if (q.type === 'spawn5th') {
+            feedback.textContent = q.triggerMsg;
+            if (!fifthSpawned) {
+              fifthSpawned = true;
+              const fifthBtn = document.createElement('button');
+              fifthBtn.className = 'option-btn bonus-opt';
+              fifthBtn.textContent = q.fifthOption;
+              fifthBtn.onclick = () => nextQuiz();
+              optionsBox.appendChild(fifthBtn);
+            }
+          } else if (q.type === 'allCorrect') {
+            feedback.className = 'feedback-msg success';
+            feedback.textContent = q.successMsg;
+            setTimeout(() => nextQuiz(), 1200);
+          }
+        };
+
         optionsBox.appendChild(btn);
       });
     }
 
-    function handleQuizAnswer(selectedIdx) {
-      const q = CONFIG.quizzes[currentQuizIdx];
-      if (selectedIdx === q.answer) {
-        currentQuizIdx++;
-        if (currentQuizIdx < CONFIG.quizzes.length) {
-          renderQuiz();
-        } else {
-          showStage(3);
-          initMemoryGame();
-        }
+    function submitGuess() {
+      const q = STAGE2_QUIZZES[qIndex];
+      const inputEl = document.getElementById('guess-input');
+      const val = parseInt(inputEl.value, 10);
+      const feedback = document.getElementById('quiz-feedback');
+
+      if (isNaN(val) || val < currentMin || val > currentMax) {
+        feedback.textContent = `請輸入 ${currentMin} 到 ${currentMax} 之間的數字喔！`;
+        return;
+      }
+
+      guessCount++;
+
+      if (val === q.targetNumber) {
+        feedback.className = 'feedback-msg success';
+        feedback.textContent = `答對了！總共花了 ${q.targetNumber} 小時（你猜了 ${guessCount} 次）🎉`;
+        setTimeout(() => nextQuiz(), 1300);
+      } else if (val > q.targetNumber) {
+        currentMax = val;
+        document.getElementById('guess-range').textContent = `目前範圍：${currentMin} ～ ${currentMax} 小時`;
+        feedback.textContent = `太大了！沒那麼誇張啦，再猜小一點 ⬇️`;
+        inputEl.value = '';
+        inputEl.focus();
       } else {
-        document.getElementById('quiz-error').textContent = q.wrongTip;
+        currentMin = val;
+        document.getElementById('guess-range').textContent = `目前範圍：${currentMin} ～ ${currentMax} 小時`;
+        feedback.textContent = `太小了！我寫得很認真耶，再猜大一點 ⬆️`;
+        inputEl.value = '';
+        inputEl.focus();
       }
     }
 
-    // --- 關卡 3 邏輯（記憶翻牌） ---
-    function initMemoryGame() {
-      const grid = document.getElementById('memory-grid');
-      grid.innerHTML = '';
+    document.getElementById('guess-input').addEventListener('keypress', e => {
+      if (e.key === 'Enter') submitGuess();
+    });
 
-      // 複製成對並洗牌
-      const deck = [...CONFIG.cardEmojis, ...CONFIG.cardEmojis]
-        .sort(() => Math.random() - 0.5);
-
-      let flippedCards = [];
-      let matchedCount = 0;
-      let lockBoard = false;
-
-      deck.forEach((emoji) => {
-        const card = document.createElement('div');
-        card.className = 'card-item';
-        card.textContent = emoji;
-
-        card.addEventListener('click', () => {
-          if (lockBoard || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-
-          card.classList.add('flipped');
-          flippedCards.push(card);
-
-          if (flippedCards.length === 2) {
-            lockBoard = true;
-            const [c1, c2] = flippedCards;
-
-            if (c1.textContent === c2.textContent) {
-              c1.classList.add('matched');
-              c2.classList.add('matched');
-              flippedCards = [];
-              lockBoard = false;
-              matchedCount += 2;
-
-              if (matchedCount === deck.length) {
-                setTimeout(unlockFinalStage, 500);
-              }
-            } else {
-              setTimeout(() => {
-                c1.classList.remove('flipped');
-                c2.classList.remove('flipped');
-                flippedCards = [];
-                lockBoard = false;
-              }, 700);
-            }
-          }
-        });
-
-        grid.appendChild(card);
-      });
-    }
-
-    // --- 關卡 4 邏輯（通關與刮刮樂） ---
-    function unlockFinalStage() {
-      document.getElementById('clue-description').textContent = CONFIG.clueHint;
-      document.getElementById('final-location').textContent = CONFIG.finalSpotTitle;
-      document.getElementById('final-sub').textContent = CONFIG.finalSpotSub;
-
-      showStage(4);
-
-      if (typeof confetti === 'function') {
-        confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
+    function nextQuiz() {
+      qIndex++;
+      if (qIndex < STAGE2_QUIZZES.length) {
+        renderQuiz();
+      } else {
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+        }
+        showStage(3);
       }
-
-      initScratchCard();
     }
 
-    function initScratchCard() {
-      const canvas = document.getElementById('scratch-pad');
-      const ctx = canvas.getContext('2d');
-      const wrap = canvas.parentElement;
-
-      canvas.width = wrap.offsetWidth;
-      canvas.height = wrap.offsetHeight;
-
-      ctx.fillStyle = '#cccccc';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#666666';
-      ctx.font = 'bold 15px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('✨ 用手指刮開看最終藏寶地點 ✨', canvas.width / 2, canvas.height / 2);
-
-      let isDrawing = false;
-
-      function scratch(e) {
-        if (!isDrawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(x, y, 22, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      canvas.addEventListener('pointerdown', e => {
-        isDrawing = true;
-        canvas.setPointerCapture(e.pointerId);
-        scratch(e);
-      });
-      canvas.addEventListener('pointermove', scratch);
-      canvas.addEventListener('pointerup', e => {
-        isDrawing = false;
-        canvas.releasePointerCapture(e.pointerId);
-      });
-      canvas.addEventListener('pointercancel', () => isDrawing = false);
-    }
+    // 初始化第一關
+    renderStage1();
   </script>
 </body>
 
