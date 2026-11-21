@@ -46,7 +46,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 20px 14px 70px;
+      padding: 20px 14px 80px;
     }
 
     .container {
@@ -269,6 +269,16 @@
       z-index: 10;
     }
 
+    .code-input.danger-input {
+      border-color: rgba(244, 63, 94, 0.6);
+      color: #fb7185;
+    }
+
+    .code-input.danger-input:focus {
+      border-color: var(--danger);
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.4);
+    }
+
     .code-input::placeholder {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-size: 16px;
@@ -373,6 +383,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      position: relative;
     }
 
     .option-btn {
@@ -393,28 +404,14 @@
       border-color: var(--primary);
     }
 
-    /* Q2 偽裝成跑版 Bug 的隱藏第 5 選項（完全同色，但歪斜卡在卡片左下邊框外緣） */
-    .bug-glitch-btn {
-      position: absolute;
-      bottom: -16px;
-      left: 12px;
-      width: auto;
-      padding: 10px 16px;
-      background: #0f172a;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 10px;
-      font-size: 14.5px;
-      color: #e2e8f0;
-      cursor: pointer;
-      transform: rotate(-4deg);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.65);
+    /* Q2 偽裝成排版 Bug 的第 5 選項：與上面選項完全同寬同高同色，但錯位歪斜破框 */
+    .option-btn.bug-glitch-opt {
+      margin-top: 22px;
+      transform: translate(24px, 6px) rotate(-3.2deg);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
+      position: relative;
       z-index: 25;
       animation: fadeIn 0.3s ease;
-    }
-
-    .bug-glitch-btn:active {
-      background: rgba(56, 189, 248, 0.18);
-      border-color: var(--primary);
     }
 
     /* Q6 終極密碼與工時證明圖片 */
@@ -635,16 +632,17 @@
           <button type="button" class="btn" id="gacha-stop-btn">停止抽獎</button>
         </div>
 
-        <!-- 第二幕：額度溢位 -> 系統過載警報 -->
+        <!-- 第二幕：額度溢位 -> 系統過載警報（需現場工程師輸入 52911 解鎖） -->
         <div id="gacha-step-2" style="display: none;">
           <div class="overload-alert-box">
             <div class="overload-title">⚠️ CRITICAL SYSTEM OVERLOAD</div>
             <div class="overload-desc">
               偵測到獎勵額度溢位（以上特權全部歸你），且對象顏值過高導致核心溫度急劇飆升！<br><br>
-              <b>唯一緊急冷卻方式：</b>請立刻轉頭親現場工程師一口以解除警報！
+              <b>唯一緊急冷卻方式：</b>請立刻轉頭親現場工程師一口，並由工程師輸入授權碼以解除警報！
             </div>
           </div>
-          <button type="button" class="btn danger-btn" id="kiss-unlock-btn">已完成親吻，解除警報</button>
+          <input type="text" inputmode="numeric" id="engineer-code-input" class="code-input danger-input" maxlength="8" autocomplete="off" placeholder="請現場工程師輸入授權碼">
+          <button type="button" class="btn danger-btn" id="kiss-unlock-btn">授權解除警報</button>
         </div>
 
         <!-- 第三幕：恢復正常 -> 獎勵縮水 + 逃跑按鈕 -->
@@ -918,12 +916,7 @@
     let gachaTimer = null;
     let escapeCount = 0;
 
-    function clearBugButtons() {
-      document.querySelectorAll('.bug-glitch-btn').forEach(el => el.remove());
-    }
-
     function renderQuiz() {
-      clearBugButtons();
       const q = STAGE2_QUIZZES[qIndex];
       const total = STAGE2_QUIZZES.length;
       const optionsBox = document.getElementById('quiz-options');
@@ -982,13 +975,13 @@
               bugSpawned = true;
               const bugBtn = document.createElement('button');
               bugBtn.type = 'button';
-              bugBtn.className = 'bug-glitch-btn';
+              bugBtn.className = 'option-btn bug-glitch-opt';
               bugBtn.textContent = q.bugOption;
               bugBtn.addEventListener('click', () => {
-                clearBugButtons();
                 nextQuiz();
               });
-              document.getElementById('main-container').appendChild(bugBtn);
+              optionsBox.appendChild(bugBtn);
+              bugBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
           }
         });
@@ -1082,6 +1075,8 @@
         reelText.style.color = '';
         document.getElementById('gacha-step-1').style.display = 'none';
         document.getElementById('gacha-step-2').style.display = 'block';
+        document.getElementById('engineer-code-input').value = '';
+        document.getElementById('quiz-feedback').textContent = '';
 
         // 切換頂部與外框為紅色警報
         document.getElementById('main-container').classList.add('alert-mode');
@@ -1092,23 +1087,41 @@
       }, 1100);
     });
 
-    // 親吻現場工程師 -> 解除警報 -> 獎勵縮水 + 逃跑按鈕
-    document.getElementById('kiss-unlock-btn').addEventListener('click', () => {
-      document.getElementById('main-container').classList.remove('alert-mode');
-      const statusBadge = document.getElementById('sys-status-badge');
-      statusBadge.classList.remove('danger');
-      document.getElementById('sys-status-text').textContent = 'ENCRYPTED';
+    // 驗證工程師手動輸入授權碼 52911 -> 解除警報 -> 獎勵縮水 + 逃跑按鈕
+    function verifyEngineerOverride() {
+      const codeInput = document.getElementById('engineer-code-input');
+      const feedback = document.getElementById('quiz-feedback');
+      const val = codeInput.value.trim();
 
-      document.getElementById('gacha-step-2').style.display = 'none';
-      document.getElementById('gacha-step-3').style.display = 'block';
-      document.getElementById('quiz-question').textContent = "Q7. 警報已解除，系統已自動修正溢位錯誤並重新核發最終獎勵：";
+      if (val === '52911') {
+        feedback.textContent = '';
+        document.getElementById('main-container').classList.remove('alert-mode');
+        const statusBadge = document.getElementById('sys-status-badge');
+        statusBadge.classList.remove('danger');
+        document.getElementById('sys-status-text').textContent = 'ENCRYPTED';
 
-      escapeCount = 0;
-      const runawayBtn = document.getElementById('runaway-protest-btn');
-      runawayBtn.className = 'runaway-btn';
-      runawayBtn.style.top = '';
-      runawayBtn.style.left = '';
-      runawayBtn.textContent = '抗議！我全都要';
+        document.getElementById('gacha-step-2').style.display = 'none';
+        document.getElementById('gacha-step-3').style.display = 'block';
+        document.getElementById('quiz-question').textContent = "Q7. 警報已解除，系統已自動修正溢位錯誤並重新核發最終獎勵：";
+
+        escapeCount = 0;
+        const runawayBtn = document.getElementById('runaway-protest-btn');
+        runawayBtn.className = 'runaway-btn';
+        runawayBtn.style.top = '';
+        runawayBtn.style.left = '';
+        runawayBtn.textContent = '抗議！我全都要';
+      } else {
+        feedback.textContent = "授權碼錯誤！請先完成任務並請現場工程師輸入正確授權碼。";
+        codeInput.value = '';
+      }
+    }
+
+    document.getElementById('kiss-unlock-btn').addEventListener('click', verifyEngineerOverride);
+    document.getElementById('engineer-code-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        verifyEngineerOverride();
+      }
     });
 
     // 接受獎勵直接過關
