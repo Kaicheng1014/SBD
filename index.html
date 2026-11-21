@@ -2,24 +2,23 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PROJECT : 1222</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --bg: #0a0d14;
       --grid-line: rgba(56, 189, 248, 0.04);
-      --card: rgba(17, 23, 36, 0.92);
-      --card-border: rgba(56, 189, 248, 0.22);
+      --card: #111724;
+      --card-border: rgba(56, 189, 248, 0.25);
       --primary: #38bdf8;
       --primary-glow: rgba(56, 189, 248, 0.35);
-      --primary-dark: #0284c7;
       --amber: #f59e0b;
       --emerald: #10b981;
       --danger: #f43f5e;
       --text: #e2e8f0;
       --sub: #94a3b8;
-      --dossier-bg: rgba(10, 14, 23, 0.85);
+      --dossier-bg: #0a0e17;
     }
 
     * {
@@ -27,21 +26,27 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    body {
+    html, body {
+      width: 100%;
+      min-height: 100dvh;
       background-color: var(--bg);
       background-image:
         linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
         linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
       background-size: 28px 28px;
       color: var(--text);
-      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    body {
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 16px;
+      align-items: flex-start;
+      padding: 20px 14px 60px;
     }
 
     .container {
@@ -50,12 +55,10 @@
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: 20px;
-      padding: 24px 20px 28px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 24px rgba(56, 189, 248, 0.08);
-      backdrop-filter: blur(12px);
+      padding: 22px 18px 26px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 24px rgba(56, 189, 248, 0.08);
       text-align: center;
       position: relative;
-      overflow: hidden;
     }
 
     /* 頂部機密系統狀態列 */
@@ -68,7 +71,7 @@
       color: var(--sub);
       border-bottom: 1px solid rgba(148, 163, 184, 0.15);
       padding-bottom: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       letter-spacing: 0.8px;
     }
 
@@ -101,15 +104,15 @@
 
     .stage {
       display: none;
-      animation: fadeIn 0.35s ease forwards;
     }
 
     .stage.active {
       display: block;
+      animation: fadeIn 0.3s ease forwards;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -123,7 +126,7 @@
       font-weight: 700;
       padding: 5px 12px;
       border-radius: 6px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       letter-spacing: 0.8px;
     }
 
@@ -137,7 +140,7 @@
     .subtitle {
       font-size: 13.5px;
       color: var(--sub);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       line-height: 1.5;
     }
 
@@ -145,17 +148,17 @@
     .collected-bar {
       display: flex;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 18px;
+      gap: 6px;
+      margin-bottom: 16px;
     }
 
     .code-slot {
       flex: 1;
-      padding: 9px 4px;
-      background: rgba(15, 23, 42, 0.9);
+      padding: 8px 2px;
+      background: #0f172a;
       border-radius: 8px;
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       color: #64748b;
       border: 1px solid rgba(148, 163, 184, 0.2);
@@ -163,10 +166,9 @@
     }
 
     .code-slot.unlocked {
-      background: rgba(16, 185, 129, 0.12);
+      background: rgba(16, 185, 129, 0.14);
       color: #34d399;
-      border-color: rgba(16, 185, 129, 0.45);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.5);
     }
 
     /* 機密檔案情報框 */
@@ -175,10 +177,9 @@
       border: 1px solid rgba(56, 189, 248, 0.25);
       border-left: 3px solid var(--primary);
       border-radius: 10px;
-      padding: 16px 15px;
-      margin-bottom: 20px;
+      padding: 15px 14px;
+      margin-bottom: 18px;
       text-align: left;
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
     }
 
     .dossier-header {
@@ -186,7 +187,7 @@
       font-size: 12.5px;
       font-weight: 700;
       color: var(--amber);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       letter-spacing: 0.6px;
     }
 
@@ -202,85 +203,98 @@
 
     .equation-box {
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       border-radius: 8px;
-      padding: 10px 8px;
+      padding: 10px 6px;
       margin: 12px 0;
       text-align: center;
-      font-size: 15.5px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--primary);
-      letter-spacing: 0.5px;
     }
 
     .example-note {
       font-size: 12.5px;
       color: var(--sub);
-      background: rgba(15, 23, 42, 0.65);
+      background: #0f172a;
       padding: 8px 10px;
       border-radius: 6px;
       margin-top: 8px;
       line-height: 1.5;
     }
 
-    input[type="text"], input[type="tel"], input[type="number"] {
+    /* 輸入框：統一 18px 避免手機縮放與點擊攔截 */
+    .code-input {
+      display: block;
       width: 100%;
-      padding: 14px;
+      padding: 14px 12px;
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       text-align: center;
-      letter-spacing: 5px;
-      background: rgba(10, 14, 23, 0.95);
-      border: 1.5px solid rgba(148, 163, 184, 0.28);
+      letter-spacing: 3px;
+      background: #080b12;
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
       border-radius: 10px;
       outline: none;
       margin-bottom: 14px;
-      color: var(--primary);
-      transition: border-color 0.2s, box-shadow 0.2s;
+      color: #38bdf8;
+      -webkit-appearance: none;
+      appearance: none;
+      user-select: text;
+      -webkit-user-select: text;
+      position: relative;
+      z-index: 10;
     }
 
-    input::placeholder {
+    .code-input::placeholder {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 400;
-      letter-spacing: 1px;
-      color: #475569;
+      letter-spacing: 0.5px;
+      color: #64748b;
     }
 
-    input:focus {
+    .code-input:focus {
       border-color: var(--primary);
       box-shadow: 0 0 14px var(--primary-glow);
     }
 
     .btn {
+      display: block;
       width: 100%;
       padding: 14px;
       background: linear-gradient(135deg, #0ea5e9, #0284c7);
       color: #ffffff;
       border: 1px solid rgba(125, 211, 252, 0.4);
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: 1.5px;
       cursor: pointer;
       box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
-      transition: transform 0.1s, filter 0.2s;
+      position: relative;
+      z-index: 10;
     }
 
     .btn:active {
       transform: scale(0.98);
-      filter: brightness(0.9);
+      filter: brightness(0.92);
     }
 
     .feedback-msg {
-      color: var(--danger);
-      font-size: 13.5px;
-      font-weight: 500;
+      display: block;
+      color: #fb7185;
+      font-size: 14px;
+      font-weight: 600;
       margin-top: 14px;
-      min-height: 20px;
       line-height: 1.55;
+      word-break: break-word;
+    }
+
+    .feedback-msg:empty {
+      display: none;
     }
 
     .feedback-msg.success {
@@ -289,23 +303,26 @@
 
     /* 累積式漸進提示列表 */
     .hint-stack {
-      margin-top: 14px;
+      margin-top: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
       text-align: left;
     }
 
+    .hint-stack:empty {
+      display: none;
+    }
+
     .hint-item {
-      background: rgba(244, 63, 94, 0.08);
-      border: 1px solid rgba(244, 63, 94, 0.28);
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.35);
       border-left: 3px solid var(--danger);
       border-radius: 8px;
       padding: 10px 12px;
-      font-size: 13px;
+      font-size: 13.5px;
       line-height: 1.55;
-      color: #fecdd3;
-      animation: fadeIn 0.3s ease forwards;
+      color: #ffe4e6;
     }
 
     .hint-level {
@@ -319,7 +336,7 @@
     .quiz-q {
       font-size: 16.5px;
       font-weight: 600;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       line-height: 1.6;
       text-align: left;
       color: #f1f5f9;
@@ -334,44 +351,39 @@
     .option-btn {
       width: 100%;
       padding: 13px 15px;
-      background: rgba(15, 23, 42, 0.85);
+      background: #0f172a;
       border: 1px solid rgba(148, 163, 184, 0.25);
       border-radius: 10px;
-      font-size: 14.5px;
-      color: #cbd5e1;
+      font-size: 15px;
+      color: #e2e8f0;
       text-align: left;
       cursor: pointer;
-      transition: all 0.2s;
       line-height: 1.45;
     }
 
     .option-btn:active {
-      background: rgba(56, 189, 248, 0.15);
+      background: rgba(56, 189, 248, 0.18);
       border-color: var(--primary);
-      color: #ffffff;
     }
 
     .option-btn.bonus-opt {
-      background: rgba(245, 158, 11, 0.14);
+      background: rgba(245, 158, 11, 0.16);
       border-color: var(--amber);
       color: #fcd34d;
       font-weight: 700;
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.2);
-      animation: fadeIn 0.35s ease;
     }
 
-    /* 關卡 2 第 9 題：終極密碼範圍提示 */
     .range-badge {
       display: inline-block;
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.4);
       padding: 8px 16px;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 700;
       color: #fbbf24;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
   </style>
 </head>
@@ -404,8 +416,8 @@
         <div class="dossier-text" id="dossier-text"></div>
       </div>
 
-      <input type="tel" id="s1-input" maxlength="6" placeholder="輸入截獲的機密數字">
-      <button class="btn" onclick="verifyStage1()">驗證情報</button>
+      <input type="text" inputmode="numeric" id="s1-input" class="code-input" maxlength="8" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="點此輸入截獲的數字">
+      <button type="button" class="btn" id="s1-submit-btn">驗證情報</button>
       <div class="feedback-msg" id="s1-feedback"></div>
       <div class="hint-stack" id="s1-hint-stack"></div>
     </div>
@@ -415,14 +427,12 @@
       <div class="step-badge" id="quiz-progress">PHASE 02 // IDENTITY SYNC (1/10)</div>
       <div id="quiz-question" class="quiz-q"></div>
       
-      <!-- 選擇題容器 -->
       <div id="quiz-options" class="options-list"></div>
 
-      <!-- 第 9 題終極密碼專用容器 -->
       <div id="guess-box" style="display: none;">
         <div class="range-badge" id="guess-range">RANGE : 1 ～ 100 HRS</div>
-        <input type="number" id="guess-input" placeholder="輸入小時數">
-        <button class="btn" onclick="submitGuess()">送出數值</button>
+        <input type="text" inputmode="numeric" id="guess-input" class="code-input" autocomplete="off" placeholder="點此輸入小時數">
+        <button type="button" class="btn" id="guess-submit-btn">送出數值</button>
       </div>
 
       <div class="feedback-msg" id="quiz-feedback"></div>
@@ -437,9 +447,6 @@
   </div>
 
   <script>
-    // =========================================================
-    // 🔧 【關卡 1：定案文案與提示】
-    // =========================================================
     const STAGE1_STEPS = [
       {
         header: "【線索檔案 #01】",
@@ -498,9 +505,6 @@
       }
     ];
 
-    // =========================================================
-    // 🔧 【關卡 2：10 題默契快問快答（待後續細修題目）】
-    // =========================================================
     const STAGE2_QUIZZES = [
       {
         type: "choice",
@@ -588,10 +592,10 @@
       }
     ];
 
-    // 切換主階段
     function showStage(num) {
       document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
       document.getElementById(`stage-${num}`).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ==================== 關卡 1 邏輯 ====================
@@ -620,13 +624,13 @@
       if (step.isFinalOperator) {
         document.getElementById('s1-title').textContent = "最終密鑰合成";
         document.getElementById('s1-subtitle').textContent = "填入三個運算符號使算式成立，解除第一道安全鎖";
-        inputEl.type = "text";
+        inputEl.setAttribute('inputmode', 'text');
         inputEl.maxLength = 8;
-        inputEl.placeholder = "輸入 3 個運算符號（如 -+*）";
+        inputEl.placeholder = "點此輸入符號（如 -+*）";
       } else {
-        inputEl.type = "tel";
+        inputEl.setAttribute('inputmode', 'numeric');
         inputEl.maxLength = 6;
-        inputEl.placeholder = "輸入截獲的機密數字";
+        inputEl.placeholder = "點此輸入截獲的數字";
       }
     }
 
@@ -636,6 +640,7 @@
       item.className = 'hint-item';
       item.innerHTML = `<span class="hint-level">${hintObj.level}</span>${hintObj.text}`;
       stack.appendChild(item);
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function verifyStage1() {
@@ -643,6 +648,12 @@
       const rawVal = inputEl.value.trim();
       const step = STAGE1_STEPS[s1Index];
       const feedback = document.getElementById('s1-feedback');
+
+      if (!rawVal) {
+        feedback.textContent = "請先在上方輸入框填入答案再送出喔！";
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
 
       let isMatch = false;
       if (step.isFinalOperator) {
@@ -662,6 +673,7 @@
         s1Index++;
         if (s1Index < STAGE1_STEPS.length) {
           renderStage1();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           if (typeof confetti === 'function') {
             confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
@@ -676,17 +688,23 @@
           const unlockedHint = FINAL_PROGRESSIVE_HINTS.find(h => h.threshold === finalWrongCount);
           if (unlockedHint) {
             appendProgressiveHint(unlockedHint);
+          } else {
+            feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
         } else {
           feedback.textContent = step.wrongMsg;
+          feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         inputEl.value = '';
-        inputEl.focus();
       }
     }
 
-    document.getElementById('s1-input').addEventListener('keypress', e => {
-      if (e.key === 'Enter') verifyStage1();
+    document.getElementById('s1-submit-btn').addEventListener('click', verifyStage1);
+    document.getElementById('s1-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        verifyStage1();
+      }
     });
 
     // ==================== 關卡 2 邏輯 ====================
@@ -702,4 +720,114 @@
       const guessBox = document.getElementById('guess-box');
       const feedback = document.getElementById('quiz-feedback');
 
-      document.getElementById('quiz-progress').textContent = 
+      document.getElementById('quiz-progress').textContent = `PHASE 02 // IDENTITY SYNC (${qIndex + 1}/${total})`;
+      document.getElementById('quiz-question').textContent = q.question;
+      feedback.textContent = '';
+      feedback.className = 'feedback-msg';
+      optionsBox.innerHTML = '';
+
+      if (q.type === 'guessNumber') {
+        optionsBox.style.display = 'none';
+        guessBox.style.display = 'block';
+        currentMin = q.min;
+        currentMax = q.max;
+        guessCount = 0;
+        document.getElementById('guess-range').textContent = `RANGE : ${currentMin} ～ ${currentMax} HRS`;
+        document.getElementById('guess-input').value = '';
+        return;
+      }
+
+      optionsBox.style.display = 'flex';
+      guessBox.style.display = 'none';
+      let fifthSpawned = false;
+
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option-btn';
+        btn.textContent = optText;
+
+        btn.addEventListener('click', () => {
+          if (q.type === 'choice') {
+            if (idx === q.answer) {
+              nextQuiz();
+            } else {
+              feedback.textContent = q.wrongMsg;
+            }
+          } else if (q.type === 'spawn5th') {
+            feedback.textContent = q.triggerMsg;
+            if (!fifthSpawned) {
+              fifthSpawned = true;
+              const fifthBtn = document.createElement('button');
+              fifthBtn.type = 'button';
+              fifthBtn.className = 'option-btn bonus-opt';
+              fifthBtn.textContent = q.fifthOption;
+              fifthBtn.addEventListener('click', () => nextQuiz());
+              optionsBox.appendChild(fifthBtn);
+            }
+          } else if (q.type === 'allCorrect') {
+            feedback.className = 'feedback-msg success';
+            feedback.textContent = q.successMsg;
+            setTimeout(() => nextQuiz(), 1200);
+          }
+        });
+
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    function submitGuess() {
+      const q = STAGE2_QUIZZES[qIndex];
+      const inputEl = document.getElementById('guess-input');
+      const val = parseInt(inputEl.value, 10);
+      const feedback = document.getElementById('quiz-feedback');
+
+      if (isNaN(val) || val < currentMin || val > currentMax) {
+        feedback.textContent = `請輸入 ${currentMin} 到 ${currentMax} 之間的數字喔！`;
+        return;
+      }
+
+      guessCount++;
+
+      if (val === q.targetNumber) {
+        feedback.className = 'feedback-msg success';
+        feedback.textContent = `答對了！總共花了 ${q.targetNumber} 小時（你猜了 ${guessCount} 次）🎉`;
+        setTimeout(() => nextQuiz(), 1300);
+      } else if (val > q.targetNumber) {
+        currentMax = val;
+        document.getElementById('guess-range').textContent = `RANGE : ${currentMin} ～ ${currentMax} HRS`;
+        feedback.textContent = `太大了！沒那麼誇張啦，再猜小一點 ⬇️`;
+        inputEl.value = '';
+      } else {
+        currentMin = val;
+        document.getElementById('guess-range').textContent = `RANGE : ${currentMin} ～ ${currentMax} HRS`;
+        feedback.textContent = `太小了！我寫得很認真耶，再猜大一點 ⬆️`;
+        inputEl.value = '';
+      }
+    }
+
+    document.getElementById('guess-submit-btn').addEventListener('click', submitGuess);
+    document.getElementById('guess-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitGuess();
+      }
+    });
+
+    function nextQuiz() {
+      qIndex++;
+      if (qIndex < STAGE2_QUIZZES.length) {
+        renderQuiz();
+      } else {
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+        }
+        showStage(3);
+      }
+    }
+
+    // 初始化第一關
+    renderStage1();
+  </script>
+</body>
+</html>
