@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -57,15 +56,8 @@
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .step-badge {
@@ -141,8 +133,7 @@
       border-color: var(--primary);
     }
 
-    input[type="tel"],
-    input[type="number"] {
+    input[type="tel"], input[type="number"] {
       width: 100%;
       padding: 14px;
       font-size: 20px;
@@ -184,7 +175,7 @@
       font-weight: 500;
       margin-top: 12px;
       min-height: 20px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .feedback-msg.success {
@@ -247,7 +238,6 @@
     }
   </style>
 </head>
-
 <body>
 
   <div class="container">
@@ -280,7 +270,7 @@
     <div id="stage-2" class="stage">
       <div class="step-badge" id="quiz-progress">STAGE 2 / 3 · 默契驗證 (1/10)</div>
       <div id="quiz-question" class="quiz-q"></div>
-
+      
       <!-- 選擇題容器 -->
       <div id="quiz-options" class="options-list"></div>
 
@@ -298,58 +288,60 @@
     <div id="stage-3" class="stage">
       <div class="step-badge">STAGE 2 COMPLETE ✅</div>
       <h1>默契考驗全數通過！</h1>
-      <p class="subtitle">你已經解開前兩道關卡，準備好進入「合照時間軸」與「最終藏寶線索」了嗎？（待我們確認後接續實作）</p>
+      <p class="subtitle">你已經解開前兩道關卡，準備好進入「合照時間軸」與「最終藏寶線索」了嗎？（待確認後接續實作）</p>
     </div>
   </div>
 
   <script>
     // =========================================================
-    // 🔧 【自訂設定區】
+    // 🔧 【關卡 1：定案文案與提示】
     // =========================================================
     const STAGE1_STEPS = [
       {
         header: "【線索檔案 #01】",
-        text: "目標物為圓弧形防護裝備，配有可掀式透明護罩與軟墊內襯，平時駐守於玄關或車廂附近，專門在移動時替你擋風並保護頭部。<br><br>請前往該裝備內部進行搜查，取得第一組機密數字。",
+        text: "目標物為一具半球形的雙層結構體——外殼堅硬、內部包覆著記憶海綿襯墊，並配有可活動的透明光學遮罩。<br><br>只有在準備進入「高速移動狀態」前，它才會被啟動並徹底包覆視線周邊。情報顯示，第一組機密數字就潛伏在該結構體的內部深處。",
         answer: "1014",
-        wrongMsg: "情報不符！請確認安全帽內部的紙條數字。"
+        wrongMsg: "情報不符！提示：往移動時穿戴的『人身部品』內部空間找找看。"
       },
       {
         header: "【線索檔案 #02】",
-        text: "牠們身上烙印著 <b>2021 至 2024</b> 的四座王者印記，且領頭者背負著 <b>No. 1</b> 編號。<br><br>情報顯示，第二組數字就潛伏在牠們的「正後方盲區」。",
+        text: "尋找並排停妥的世界冠軍賽車，車號為 <b>No. 1</b>。<br><br>情報顯示，第二組數字就潛伏在正後方。",
         answer: "1222",
-        wrongMsg: "數字不對喔，再仔細看看冠軍車組正後方的紙條！"
+        wrongMsg: "數字不對喔！提示：想一想 2021 到 2024 是誰的連霸時代？線索就藏在牠們的車後方。"
       },
       {
         header: "【線索檔案 #03】",
-        text: "目標位於虛擬賽道的駕駛艙最深處——在「視線正下方」的黑暗地帶，那裡並列著三組金屬控制板，分別掌管著「加速」、「減速」與「動力銜接」。<br><br>情報顯示，第三組數字就潛伏在這三組足部控制裝置的「側邊角落」。",
+        text: "目標鎖定虛擬賽道的駕駛操控模組——在底部結構中，並列著三組金屬控制板，分別掌管著「加速」、「減速」與「動力銜接」。<br><br>情報顯示，第三組數字就在這附近。",
         answer: "0109",
-        wrongMsg: "情報錯誤！請檢查踏板側邊角落的紙條。"
+        wrongMsg: "情報錯誤！提示：搜尋『模擬駕駛硬體』的足部感應組件，線索貼在金屬結構上。"
       },
       {
         header: "【線索檔案 #04】",
         text: "最後一組數字並未藏在紙條裡，而是直接暴露在空氣中。<br><br>請暫停腳步、抬頭環顧一下四周環境——線索就掛在最顯眼的地方，正靜靜地看著你。",
         answer: "12",
-        wrongMsg: "不對喔，抬頭看看顯眼處掛著的數字！"
+        wrongMsg: "不對喔！提示：不用翻找任何角落，把視線往上移，留意四周環境高處懸掛的物件。"
       },
       {
         header: "【最終解碼指令】",
         text: "四組機密數字已全數截獲！<br><br>請將你收集到的四組數字<b>全部相加</b>，輸入最終總和以解除第一道安全鎖。",
         answer: "2357",
-        wrongMsg: "加總算錯囉！提示：1014 + 1222 + 0109 + 12 = ?"
+        wrongMsg: "加總算錯囉！提示：把上方四個格子解鎖的數字全部加起來，再按一次計算機確認看看！"
       }
     ];
 
-    // 關卡 2：10 題題庫設定（可依需求微調文字）
+    // =========================================================
+    // 🔧 【關卡 2：10 題默契快問快答（待後續細修題目）】
+    // =========================================================
     const STAGE2_QUIZZES = [
       {
         type: "choice",
         question: "Q1. 還記得我們「第一次談話」時，聊到的第一個話題是什麼嗎？",
         options: ["某堂課／學校的事情", "今天天氣很好", "你的穿搭很好看", "要不要一起去吃飯"],
-        answer: 0, // 0=第一個選項，可依真實情況修改選項文字與 answer 索引
+        answer: 0,
         wrongMsg: "再想一下！我們剛認識時是從什麼話題開啟對話的？"
       },
       {
-        type: "spawn5th", // 特殊機關：點前4個任一個都會跳出提示並生出第5個選項
+        type: "spawn5th",
         question: "Q2. 我平常最常對你說的一句話是什麼？",
         options: [
           "你今天好漂亮",
@@ -396,7 +388,7 @@
         wrongMsg: "這題送分題還選錯！再給你一次機會 😜"
       },
       {
-        type: "allCorrect", // 特殊機關：4個全對的暖心題
+        type: "allCorrect",
         question: "Q8. 下面哪一件事情，其實是我「偷偷記在心裡」但平常很少掛在嘴邊的？",
         options: [
           "你生理期快來時不能喝冰的",
@@ -407,14 +399,14 @@
         successMsg: "答對了！其實這四件事我全都記在心裡 ❤️"
       },
       {
-        type: "guessNumber", // 特殊機關：終極密碼猜小時數
+        type: "guessNumber",
         question: "Q9. 猜猜看，籌備這次的生日驚喜與網頁，我總共花了多少小時寫程式與測試？",
-        targetNumber: 36, // 🔧 在這裡設定正確小時數（1 ~ 100 之間）
+        targetNumber: 36,
         min: 1,
         max: 100
       },
       {
-        type: "spawn5th", // 第 10 題：選單一願望被退回，解鎖全包選項
+        type: "spawn5th",
         question: "Q10. 最後一題！通關後你最想用這張實體卡片兌換什麼？",
         options: [
           "一頓豪華生日大餐",
@@ -426,7 +418,6 @@
         fifthOption: "✨ 以上全部都要，我全包了！ ✨"
       }
     ];
-    // =========================================================
 
     // 切換主階段
     function showStage(num) {
@@ -458,7 +449,6 @@
       const feedback = document.getElementById('s1-feedback');
 
       if (val === step.answer) {
-        // 更新上方收集格子
         if (s1Index < 4) {
           const slot = document.getElementById(`slot-${s1Index}`);
           slot.textContent = `#0${s1Index + 1}: ${step.answer}`;
@@ -469,7 +459,6 @@
         if (s1Index < STAGE1_STEPS.length) {
           renderStage1();
         } else {
-          // 關卡 1 全部通過，進入關卡 2
           if (typeof confetti === 'function') {
             confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
           }
@@ -607,5 +596,4 @@
     renderStage1();
   </script>
 </body>
-
 </html>
