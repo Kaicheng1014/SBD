@@ -8,18 +8,23 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
-      --bg: #0a0d14;
-      --grid-line: rgba(56, 189, 248, 0.04);
-      --card: #111724;
-      --card-border: rgba(56, 189, 248, 0.25);
-      --primary: #38bdf8;
-      --primary-glow: rgba(56, 189, 248, 0.35);
-      --amber: #f59e0b;
+      --bg: #130f0c;
+      --grid-line: rgba(217, 119, 6, 0.05);
+      --card: #1d1712;
+      --card-border: rgba(217, 119, 6, 0.35);
+      --primary: #f59e0b;
+      --primary-glow: rgba(245, 158, 11, 0.35);
+      --amber: #fbbf24;
       --emerald: #10b981;
-      --danger: #f43f5e;
-      --text: #e2e8f0;
-      --sub: #94a3b8;
-      --dossier-bg: #0a0e17;
+      --danger: #dc2626;
+      --text: #f7f1e7;
+      --sub: #aba193;
+      --dossier-bg: #17120e;
+      --paper-cream: #fbf7ee;
+      --paper-border: #e8ded0;
+      --polaroid-bg: #fffdf9;
+      --purin-gold: #fbbf24;
+      --purin-brown: #78350f;
     }
 
     * {
@@ -55,19 +60,38 @@
       width: 100%;
       max-width: 420px;
       background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 22px 18px 26px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 24px rgba(56, 189, 248, 0.08);
+      border: 1.5px solid var(--card-border);
+      border-radius: 18px;
+      padding: 24px 18px 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(217, 119, 6, 0.08);
       text-align: center;
       position: relative;
       transition: border-color 0.25s, box-shadow 0.25s;
     }
 
+    /* 復古公文夾四角細節裝飾 */
+    .container::before {
+      content: "✦";
+      position: absolute;
+      top: 7px;
+      left: 12px;
+      color: rgba(245, 158, 11, 0.35);
+      font-size: 11px;
+    }
+
+    .container::after {
+      content: "✦";
+      position: absolute;
+      top: 7px;
+      right: 12px;
+      color: rgba(245, 158, 11, 0.35);
+      font-size: 11px;
+    }
+
     /* 系統過載紅色警報狀態 */
     .container.alert-mode {
-      border-color: rgba(244, 63, 94, 0.85);
-      box-shadow: 0 0 35px rgba(244, 63, 94, 0.35), 0 20px 50px rgba(0, 0, 0, 0.85);
+      border-color: rgba(220, 38, 38, 0.9);
+      box-shadow: 0 0 35px rgba(220, 38, 38, 0.4), 0 20px 50px rgba(0, 0, 0, 0.85);
       animation: alertPulse 1.1s infinite;
     }
 
@@ -75,11 +99,11 @@
 
       0%,
       100% {
-        box-shadow: 0 0 25px rgba(244, 63, 94, 0.28);
+        box-shadow: 0 0 25px rgba(220, 38, 38, 0.3);
       }
 
       50% {
-        box-shadow: 0 0 42px rgba(244, 63, 94, 0.55);
+        box-shadow: 0 0 45px rgba(220, 38, 38, 0.6);
       }
     }
 
@@ -91,15 +115,47 @@
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
       font-size: 11px;
       color: var(--sub);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      border-bottom: 1px solid rgba(217, 119, 6, 0.2);
       padding-bottom: 12px;
       margin-bottom: 16px;
       letter-spacing: 0.8px;
     }
 
+    .sys-id-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .purin-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--primary);
+      object-fit: cover;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+      background: #fef08a;
+      flex-shrink: 0;
+    }
+
+    .sys-id-text-group {
+      display: flex;
+      flex-direction: column;
+    }
+
     .sys-id {
       color: var(--primary);
       font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .purin-subtag {
+      font-size: 9.5px;
+      color: #fbbf24;
+      font-weight: 600;
+      letter-spacing: 0.2px;
     }
 
     .sys-status {
@@ -107,16 +163,22 @@
       align-items: center;
       gap: 6px;
       color: var(--emerald);
-      font-size: 10.5px;
+      font-size: 10px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
     }
 
     .sys-status.danger {
       color: var(--danger);
+      background: rgba(220, 38, 38, 0.12);
+      border-color: rgba(220, 38, 38, 0.35);
     }
 
     .pulse-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       background-color: var(--emerald);
       border-radius: 50%;
       box-shadow: 0 0 8px var(--emerald);
@@ -166,10 +228,10 @@
     .step-badge {
       display: inline-block;
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      background: rgba(56, 189, 248, 0.12);
+      background: rgba(245, 158, 11, 0.12);
       color: var(--primary);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      font-size: 11.5px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      font-size: 11px;
       font-weight: 700;
       padding: 5px 12px;
       border-radius: 6px;
@@ -181,7 +243,7 @@
       font-size: 20px;
       letter-spacing: 0.5px;
       margin-bottom: 6px;
-      color: #f8fafc;
+      color: #fdfaf5;
     }
 
     .subtitle {
@@ -202,31 +264,40 @@
     .code-slot {
       flex: 1;
       padding: 8px 2px;
-      background: #0f172a;
+      background: #15110d;
       border-radius: 8px;
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
-      color: #64748b;
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #8c8273;
+      border: 1px solid rgba(217, 119, 6, 0.2);
       transition: all 0.3s ease;
     }
 
     .code-slot.unlocked {
-      background: rgba(16, 185, 129, 0.14);
+      background: rgba(16, 185, 129, 0.15);
       color: #34d399;
       border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
     }
 
     /* 機密檔案情報框 */
     .dossier-box {
       background: var(--dossier-bg);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-left: 3px solid var(--primary);
+      border: 1px solid rgba(217, 119, 6, 0.28);
+      border-left: 3.5px solid var(--primary);
       border-radius: 10px;
-      padding: 15px 14px;
+      padding: 16px 14px;
       margin-bottom: 18px;
       text-align: left;
+      position: relative;
+    }
+
+    .dossier-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
     }
 
     .dossier-header {
@@ -234,41 +305,64 @@
       font-size: 12.5px;
       font-weight: 700;
       color: var(--amber);
-      margin-bottom: 8px;
       letter-spacing: 0.6px;
+    }
+
+    .purin-dossier-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 12px;
+      padding: 2px 7px;
+    }
+
+    .purin-dossier-badge img {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .purin-dossier-badge span {
+      font-size: 9.5px;
+      color: #fde047;
+      font-weight: 600;
     }
 
     .dossier-text {
       font-size: 14.5px;
       line-height: 1.75;
-      color: #cbd5e1;
+      color: #dfd7cc;
     }
 
     .dossier-text b {
-      color: #f8fafc;
+      color: #fdfaf5;
     }
 
     .equation-box {
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
       border-radius: 8px;
       padding: 10px 6px;
       margin: 12px 0;
       text-align: center;
       font-size: 15px;
       font-weight: 700;
-      color: var(--primary);
+      color: #fbbf24;
     }
 
     .example-note {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--sub);
-      background: #0f172a;
+      background: #140f0c;
       padding: 8px 10px;
       border-radius: 6px;
       margin-top: 8px;
       line-height: 1.5;
+      border: 1px solid rgba(217, 119, 6, 0.15);
     }
 
     .code-input {
@@ -280,12 +374,12 @@
       font-weight: 700;
       text-align: center;
       letter-spacing: 3px;
-      background: #080b12;
-      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      background: #130e0b;
+      border: 1.5px solid rgba(245, 158, 11, 0.35);
       border-radius: 10px;
       outline: none;
       margin-bottom: 14px;
-      color: #38bdf8;
+      color: #fbbf24;
       -webkit-appearance: none;
       appearance: none;
       user-select: text;
@@ -295,22 +389,22 @@
     }
 
     .code-input.danger-input {
-      border-color: rgba(244, 63, 94, 0.6);
-      color: #fb7185;
+      border-color: rgba(220, 38, 38, 0.6);
+      color: #fca5a5;
       letter-spacing: 6px;
     }
 
     .code-input.danger-input:focus {
       border-color: var(--danger);
-      box-shadow: 0 0 14px rgba(244, 63, 94, 0.4);
+      box-shadow: 0 0 14px rgba(220, 38, 38, 0.4);
     }
 
     .code-input::placeholder {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 400;
       letter-spacing: 0.5px;
-      color: #64748b;
+      color: #786f62;
     }
 
     .code-input:focus {
@@ -322,17 +416,18 @@
       display: block;
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      background: linear-gradient(135deg, #d97706, #b45309);
       color: #ffffff;
-      border: 1px solid rgba(125, 211, 252, 0.4);
+      border: 1px solid rgba(251, 191, 36, 0.45);
       border-radius: 10px;
       font-size: 16px;
       font-weight: 700;
       letter-spacing: 1.5px;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+      box-shadow: 0 4px 18px rgba(180, 83, 9, 0.35);
       position: relative;
       z-index: 10;
+      transition: filter 0.15s, transform 0.15s;
     }
 
     .btn:active {
@@ -341,9 +436,9 @@
     }
 
     .btn.danger-btn {
-      background: linear-gradient(135deg, #f43f5e, #be123c);
-      border-color: rgba(253, 164, 175, 0.5);
-      box-shadow: 0 4px 18px rgba(244, 63, 94, 0.4);
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      border-color: rgba(252, 165, 165, 0.5);
+      box-shadow: 0 4px 18px rgba(220, 38, 38, 0.4);
     }
 
     .feedback-msg {
@@ -415,18 +510,20 @@
     .option-btn {
       width: 100%;
       padding: 13px 15px;
-      background: #0f172a;
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: #18130f;
+      border: 1px solid rgba(217, 119, 6, 0.28);
       border-radius: 10px;
       font-size: 15px;
-      color: #e2e8f0;
+      color: #ede5d8;
       text-align: left;
       cursor: pointer;
       line-height: 1.45;
+      transition: background 0.2s, border-color 0.2s;
     }
 
-    .option-btn:active {
-      background: rgba(56, 189, 248, 0.18);
+    .option-btn:active,
+    .option-btn:hover {
+      background: rgba(245, 158, 11, 0.16);
       border-color: var(--primary);
     }
 
@@ -438,6 +535,8 @@
       position: relative;
       z-index: 25;
       animation: fadeIn 0.3s ease;
+      background: #201812;
+      border-color: rgba(245, 158, 11, 0.5);
     }
 
     /* Q6 終極密碼與工時證明圖片 */
@@ -454,9 +553,39 @@
       margin-bottom: 14px;
     }
 
+    /* Q6 布丁狗舉重加油卡片 */
+    .purin-gym-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px dashed rgba(251, 191, 36, 0.35);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 14px;
+      text-align: left;
+    }
+
+    .purin-gym-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      flex-shrink: 0;
+    }
+
+    .purin-gym-speech {
+      font-size: 12px;
+      color: #fde047;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
     .proof-box {
       margin-top: 14px;
-      background: #0a0e17;
+      background: #15110d;
       border: 1px solid rgba(16, 185, 129, 0.4);
       border-radius: 12px;
       padding: 12px;
@@ -474,7 +603,7 @@
 
     .proof-fallback {
       padding: 24px 12px;
-      border: 1px dashed rgba(148, 163, 184, 0.35);
+      border: 1px dashed rgba(217, 119, 6, 0.35);
       border-radius: 8px;
       color: var(--sub);
       font-size: 13px;
@@ -483,12 +612,25 @@
 
     /* Q7 抽卡機＋系統過載＋逃跑按鈕 */
     .slot-machine-box {
-      background: #080b12;
-      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      background: #14100c;
+      border: 1.5px solid rgba(245, 158, 11, 0.4);
       border-radius: 12px;
       padding: 20px 12px;
       margin-bottom: 16px;
-      box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.08);
+      box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.08);
+      position: relative;
+    }
+
+    .purin-roulette-badge {
+      position: absolute;
+      top: -12px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      object-fit: cover;
     }
 
     .slot-reel-label {
@@ -507,7 +649,7 @@
     }
 
     .overload-alert-box {
-      background: rgba(244, 63, 94, 0.14);
+      background: rgba(220, 38, 38, 0.14);
       border: 1.5px solid var(--danger);
       border-radius: 12px;
       padding: 16px 14px;
@@ -519,14 +661,14 @@
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
       font-size: 13px;
       font-weight: 700;
-      color: #fb7185;
+      color: #fca5a5;
       margin-bottom: 8px;
     }
 
     .overload-desc {
       font-size: 14.5px;
       line-height: 1.65;
-      color: #ffe4e6;
+      color: #fee2e2;
     }
 
     .final-reward-card {
@@ -561,8 +703,8 @@
     .runaway-btn {
       width: 100%;
       padding: 12px;
-      background: #0f172a;
-      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: #18130f;
+      border: 1px solid rgba(217, 119, 6, 0.35);
       border-radius: 10px;
       font-size: 14.5px;
       color: var(--sub);
@@ -576,10 +718,10 @@
       width: auto;
       padding: 11px 18px;
       z-index: 30;
-      background: #0f172a;
+      background: #1f1712;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.8);
-      border-color: rgba(244, 63, 94, 0.55);
-      color: #fda4af;
+      border-color: rgba(220, 38, 38, 0.6);
+      color: #fca5a5;
       white-space: nowrap;
     }
 
@@ -593,7 +735,7 @@
       font-weight: 700;
     }
 
-    /* ==================== 關卡 3 & 4 樣式 ==================== */
+    /* ==================== 關卡 3 & 4 樣式 (拍立得手帳 × 特務公文夾) ==================== */
     .container.stage-3-active,
     .container.stage-4-active {
       max-width: 580px;
@@ -615,20 +757,20 @@
       flex: 1;
       min-width: 54px;
       padding: 6px 3px;
-      background: #0f172a;
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: #18130f;
+      border: 1px solid rgba(217, 119, 6, 0.28);
       border-radius: 8px;
       font-family: "SF Mono", "Fira Code", Menlo, monospace;
       font-size: 11.5px;
       font-weight: 700;
-      color: #94a3b8;
+      color: #aba193;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .year-nav-pill:active,
     .year-nav-pill.active {
-      background: rgba(56, 189, 248, 0.2);
+      background: rgba(245, 158, 11, 0.18);
       border-color: var(--primary);
       color: var(--primary);
     }
@@ -636,7 +778,7 @@
     .year-nav-pill.done {
       border-color: rgba(16, 185, 129, 0.6);
       color: #34d399;
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(16, 185, 129, 0.12);
     }
 
     /* 頂部操作按鈕列 (重置 / 提示) */
@@ -650,10 +792,10 @@
 
     .action-chip-btn {
       padding: 6px 12px;
-      background: #080b12;
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: #16120e;
+      border: 1px solid rgba(217, 119, 6, 0.28);
       border-radius: 6px;
-      color: #cbd5e1;
+      color: #dfd7cc;
       font-size: 12px;
       cursor: pointer;
       display: inline-flex;
@@ -668,17 +810,17 @@
     }
 
     .action-chip-btn.hint-btn {
-      border-color: rgba(245, 158, 11, 0.4);
+      border-color: rgba(245, 158, 11, 0.45);
       color: var(--amber);
-      background: rgba(245, 158, 11, 0.08);
+      background: rgba(245, 158, 11, 0.1);
     }
 
     /* 待歸位照片時空碎片區 (Photo Pool) */
     .pool-card {
-      background: #080b12;
-      border: 1.5px dashed rgba(56, 189, 248, 0.35);
+      background: #17120e;
+      border: 1.5px dashed rgba(217, 119, 6, 0.35);
       border-radius: 14px;
-      padding: 12px 10px;
+      padding: 14px 10px;
       margin-bottom: 16px;
       text-align: left;
       position: relative;
@@ -687,7 +829,7 @@
 
     .pool-card.drag-over {
       border-color: var(--primary);
-      background: rgba(56, 189, 248, 0.08);
+      background: rgba(245, 158, 11, 0.08);
     }
 
     .pool-header {
@@ -696,6 +838,20 @@
       align-items: center;
       margin-bottom: 8px;
       padding: 0 4px;
+    }
+
+    .pool-title-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .purin-pool-sticker {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--primary);
+      object-fit: cover;
     }
 
     .pool-title {
@@ -707,18 +863,19 @@
     }
 
     .pool-count-badge {
-      background: rgba(56, 189, 248, 0.15);
-      color: #7dd3fc;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fde047;
       font-size: 11px;
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 12px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
     .pool-hint-text {
       font-size: 12px;
       color: var(--sub);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       padding: 0 4px;
       line-height: 1.4;
     }
@@ -726,10 +883,10 @@
     .photo-pool-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      max-height: 220px;
+      gap: 12px 10px;
+      max-height: 240px;
       overflow-y: auto;
-      padding: 4px;
+      padding: 8px 4px 10px;
       -webkit-overflow-scrolling: touch;
       border-radius: 8px;
     }
@@ -746,21 +903,39 @@
       border: 1px solid rgba(16, 185, 129, 0.25);
     }
 
-    /* 照片項目 (Photo Item) */
+    /* 拍立得照片項目 (Polaroid Photo Item) */
     .photo-item {
       position: relative;
-      width: 72px;
-      height: 72px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid rgba(148, 163, 184, 0.3);
-      background: #000000;
+      width: 78px;
+      height: 94px;
+      border-radius: 4px;
+      background: #fffdf9;
+      padding: 5px 5px 18px 5px;
+      border: 1px solid rgba(217, 119, 6, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
       cursor: grab;
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
-      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
       flex-shrink: 0;
+      overflow: visible;
+    }
+
+    /* 頂部和紙膠帶 (Washi Tape) */
+    .photo-item::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-2.5deg);
+      width: 26px;
+      height: 9px;
+      background: rgba(245, 158, 11, 0.6);
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+      z-index: 6;
+      pointer-events: none;
     }
 
     .photo-item:active {
@@ -769,25 +944,26 @@
 
     .photo-item img {
       width: 100%;
-      height: 100%;
+      height: 68px;
       object-fit: cover;
       display: block;
       pointer-events: none;
-      background: #080b12;
+      border-radius: 2px;
+      background: #18130f;
     }
 
-    /* 選取狀態：點擊選中時發光 */
+    /* 選取狀態：浮起發光 */
     .photo-item.selected {
-      border-color: #38bdf8 !important;
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.85);
-      transform: scale(1.05);
+      border-color: #f59e0b !important;
+      box-shadow: 0 8px 22px rgba(245, 158, 11, 0.65);
+      transform: scale(1.08) rotate(1deg);
       z-index: 10;
     }
 
-    /* 提示狀態：放錯年份高亮 */
+    /* 提示狀態：放錯年份紅色警示 */
     .photo-item.wrong-year-hint {
-      border-color: #f43f5e !important;
-      box-shadow: 0 0 10px rgba(244, 63, 94, 0.7);
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
     }
 
     /* 拖曳中半透明 */
@@ -798,11 +974,11 @@
 
     .photo-item .preview-trigger {
       position: absolute;
-      top: 2px;
-      right: 2px;
+      top: 6px;
+      right: 6px;
       width: 20px;
       height: 20px;
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(23, 18, 14, 0.85);
       color: #ffffff;
       border-radius: 4px;
       display: flex;
@@ -811,7 +987,7 @@
       font-size: 11px;
       cursor: pointer;
       opacity: 0.85;
-      z-index: 5;
+      z-index: 7;
     }
 
     .photo-item .preview-trigger:hover {
@@ -820,20 +996,18 @@
       color: #000;
     }
 
-    /* 日期解鎖標籤 (Hint 3) */
+    /* 日期解鎖標籤 (Hint 3 - 拍立得下方手寫感日期) */
     .photo-date-badge {
       position: absolute;
-      bottom: 0;
+      bottom: 2px;
       left: 0;
       right: 0;
-      background: rgba(0, 0, 0, 0.85);
-      color: #38bdf8;
+      color: #78350f;
       font-family: "SF Mono", monospace;
-      font-size: 9px;
+      font-size: 8.5px;
       text-align: center;
-      padding: 1.5px 0;
       font-weight: 700;
-      letter-spacing: -0.2px;
+      letter-spacing: -0.3px;
     }
 
     /* 年份軌道容器 (Year Track Card) */
@@ -845,8 +1019,8 @@
     }
 
     .year-track-card {
-      background: #0d131f;
-      border: 1px solid rgba(56, 189, 248, 0.2);
+      background: #1a1410;
+      border: 1px solid rgba(217, 119, 6, 0.25);
       border-radius: 14px;
       padding: 14px 12px;
       text-align: left;
@@ -856,26 +1030,26 @@
 
     .year-track-card.drag-over {
       border-color: var(--primary);
-      background: rgba(56, 189, 248, 0.08);
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+      background: rgba(245, 158, 11, 0.08);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
     }
 
     .year-track-card.target-year-ready {
-      border-color: rgba(56, 189, 248, 0.6);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+      border-color: rgba(245, 158, 11, 0.6);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
     }
 
-    /* 年份已驗證正確 (完美綠色發光) */
+    /* 年份已驗證正確 (綠色封蠟印章感) */
     .year-track-card.status-correct {
       border-color: rgba(16, 185, 129, 0.65);
       background: rgba(16, 185, 129, 0.06);
-      box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.2);
     }
 
-    /* 年份驗證有誤 (橘紅警示) */
+    /* 年份驗證有誤 (紅章警示) */
     .year-track-card.status-error {
-      border-color: rgba(244, 63, 94, 0.6);
-      background: rgba(244, 63, 94, 0.05);
+      border-color: rgba(220, 38, 38, 0.6);
+      background: rgba(220, 38, 38, 0.05);
     }
 
     .year-track-header {
@@ -893,9 +1067,9 @@
 
     .year-title {
       font-family: "SF Mono", "Fira Code", Menlo, monospace;
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 700;
-      color: #f8fafc;
+      color: #fdfaf5;
       letter-spacing: 0.5px;
     }
 
@@ -903,10 +1077,10 @@
       font-size: 11.5px;
       font-family: "SF Mono", monospace;
       color: var(--sub);
-      background: #080b12;
+      background: #14100c;
       padding: 2px 7px;
       border-radius: 6px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      border: 1px solid rgba(217, 119, 6, 0.2);
     }
 
     .year-status-badge {
@@ -915,7 +1089,7 @@
       padding: 3px 9px;
       border-radius: 6px;
       color: var(--sub);
-      background: rgba(148, 163, 184, 0.1);
+      background: rgba(217, 119, 6, 0.1);
     }
 
     .year-track-card.status-correct .year-status-badge {
@@ -924,21 +1098,21 @@
     }
 
     .year-track-card.status-error .year-status-badge {
-      background: rgba(244, 63, 94, 0.2);
-      color: #fb7185;
+      background: rgba(220, 38, 38, 0.2);
+      color: #fca5a5;
     }
 
     /* 年份放置槽 (Slots) */
     .year-slots-area {
-      min-height: 86px;
+      min-height: 106px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
-      padding: 8px 6px;
-      background: #080c14;
+      gap: 12px 10px;
+      padding: 10px 8px;
+      background: #130f0c;
       border-radius: 10px;
-      border: 1px dashed rgba(148, 163, 184, 0.25);
+      border: 1px dashed rgba(217, 119, 6, 0.25);
       position: relative;
     }
 
@@ -946,31 +1120,29 @@
       width: 100%;
       text-align: center;
       font-size: 12.5px;
-      color: #64748b;
-      padding: 16px 8px;
+      color: #8c8273;
+      padding: 20px 8px;
       cursor: pointer;
       pointer-events: auto;
     }
 
-    /* 年份內已放置的照片卡片 (包含序號與快速調整按鈕) */
+    /* 年份內已放置的拍立得卡片 (包含序號與快速微調按鈕) */
     .placed-photo-card {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #0f172a;
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 8px;
-      padding: 4px;
-      gap: 3px;
+      background: transparent;
+      padding: 0;
+      gap: 4px;
     }
 
     .placed-order-badge {
       font-family: "SF Mono", monospace;
       font-size: 10px;
       font-weight: 700;
-      color: var(--primary);
-      background: rgba(56, 189, 248, 0.15);
+      color: var(--amber);
+      background: rgba(245, 158, 11, 0.15);
       padding: 1px 6px;
       border-radius: 4px;
       width: 100%;
@@ -988,11 +1160,11 @@
     .ctrl-mini-btn {
       flex: 1;
       padding: 3px 0;
-      background: #1e293b;
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: #241c16;
+      border: 1px solid rgba(217, 119, 6, 0.25);
       border-radius: 4px;
-      color: #94a3b8;
-      font-size: 10.5px;
+      color: #aba193;
+      font-size: 10px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1012,13 +1184,13 @@
 
     /* 懸浮快速放置提示列 */
     .selected-banner {
-      background: rgba(56, 189, 248, 0.15);
+      background: rgba(245, 158, 11, 0.15);
       border: 1px solid var(--primary);
       border-radius: 8px;
       padding: 8px 12px;
       margin-bottom: 14px;
       font-size: 13px;
-      color: #7dd3fc;
+      color: #fde047;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -1027,7 +1199,7 @@
 
     .selected-banner-cancel {
       font-size: 11.5px;
-      color: #cbd5e1;
+      color: #ede5d8;
       text-decoration: underline;
       cursor: pointer;
     }
@@ -1039,7 +1211,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.92);
+      background: rgba(14, 11, 8, 0.94);
       z-index: 9999;
       display: none;
       align-items: center;
@@ -1054,8 +1226,8 @@
     }
 
     .lightbox-content {
-      background: #0f172a;
-      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: #1f1813;
+      border: 1px solid rgba(245, 158, 11, 0.4);
       border-radius: 16px;
       padding: 18px 16px;
       max-width: 480px;
@@ -1078,6 +1250,7 @@
       border-radius: 10px;
       background: #000000;
       margin-bottom: 12px;
+      border: 1px solid rgba(217, 119, 6, 0.2);
     }
 
     .lightbox-img-box img {
@@ -1090,7 +1263,7 @@
     .lightbox-caption {
       font-family: "SF Mono", monospace;
       font-size: 13.5px;
-      color: #94a3b8;
+      color: #dfd7cc;
       margin-bottom: 12px;
       text-align: center;
     }
@@ -1106,10 +1279,10 @@
 
     .lightbox-year-btn {
       padding: 8px 12px;
-      background: #1e293b;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: #241c16;
+      border: 1px solid rgba(245, 158, 11, 0.3);
       border-radius: 8px;
-      color: #e2e8f0;
+      color: #ede5d8;
       font-family: "SF Mono", monospace;
       font-size: 12px;
       font-weight: 600;
@@ -1129,36 +1302,63 @@
       right: 14px;
       background: none;
       border: none;
-      color: #94a3b8;
+      color: #aba193;
       font-size: 26px;
       cursor: pointer;
       padding: 4px;
       line-height: 1;
     }
 
-    /* 關卡 4 (通關獎勵 / 禮物解密) */
+    /* 關卡 4 (通關結案報告與禮物) */
     .stage4-dossier {
-      background: #0a0e17;
+      background: #17120e;
       border: 1px solid rgba(16, 185, 129, 0.4);
       border-radius: 14px;
       padding: 18px 16px;
       margin-bottom: 20px;
       text-align: left;
+      position: relative;
     }
 
     .stage4-gift-box {
-      background: radial-gradient(circle at center, rgba(56, 189, 248, 0.15), transparent 70%), #0a0e17;
+      background: radial-gradient(circle at center, rgba(245, 158, 11, 0.15), transparent 70%), #17120e;
       border: 2px solid var(--primary);
       border-radius: 16px;
       padding: 24px 16px;
       margin-bottom: 20px;
-      box-shadow: 0 0 30px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
       text-align: center;
+    }
+
+    /* Stage 4 布丁狗慶生圖樣 */
+    .purin-birthday-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 14px 0 16px;
+      padding: 12px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px dashed rgba(251, 191, 36, 0.35);
+      border-radius: 12px;
+    }
+
+    .purin-birthday-img {
+      max-width: 140px;
+      max-height: 120px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .purin-birthday-speech {
+      font-size: 13px;
+      color: #fde047;
+      font-weight: 700;
     }
 
     .gift-reveal-card {
       display: none;
-      background: #080b12;
+      background: #130f0c;
       border: 1.5px solid rgba(16, 185, 129, 0.5);
       border-radius: 12px;
       padding: 20px 16px;
@@ -1178,41 +1378,107 @@
     .gift-letter-body {
       font-size: 14.5px;
       line-height: 1.8;
-      color: #cbd5e1;
+      color: #dfd7cc;
       margin-bottom: 16px;
     }
 
     .gift-coord-box {
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
       border-radius: 10px;
       padding: 12px;
       font-size: 14.5px;
-      color: #f8fafc;
+      color: #fdfaf5;
       font-weight: 700;
       text-align: center;
       line-height: 1.6;
     }
 
-    /* 手機觸控拖曳浮動殘影 */
+    /* 手機觸控拖曳殘影 */
     .touch-drag-ghost {
       position: fixed;
-      width: 72px;
-      height: 72px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid #38bdf8;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(56, 189, 248, 0.6);
+      width: 78px;
+      height: 94px;
+      border-radius: 4px;
+      background: #fffdf9;
+      padding: 4px 4px 18px 4px;
+      border: 1.5px solid #f59e0b;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.5);
       pointer-events: none;
       z-index: 10000;
-      opacity: 0.9;
+      opacity: 0.92;
       transform: translate(-50%, -50%);
     }
 
     .touch-drag-ghost img {
       width: 100%;
-      height: 100%;
+      height: 68px;
       object-fit: cover;
+      border-radius: 2px;
+    }
+
+    /* 右下角布丁狗互動小彩蛋 (Floating Easter Egg) */
+    .purin-floating-badge {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(30, 23, 18, 0.92);
+      border: 1.5px solid var(--primary);
+      border-radius: 30px;
+      padding: 5px 12px 5px 5px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 14px rgba(245, 158, 11, 0.25);
+      cursor: pointer;
+      z-index: 900;
+      backdrop-filter: blur(6px);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .purin-floating-badge:hover,
+    .purin-floating-badge:active {
+      transform: scale(1.08);
+    }
+
+    .purin-floating-img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #fde047;
+      background: #fef08a;
+      flex-shrink: 0;
+    }
+
+    .purin-speech-bubble {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fde047;
+      white-space: nowrap;
+    }
+
+    /* 彩蛋跳動動畫 */
+    @keyframes purinBounce {
+
+      0%,
+      100% {
+        transform: scale(1) translateY(0);
+      }
+
+      30% {
+        transform: scale(1.15) translateY(-8px);
+      }
+
+      60% {
+        transform: scale(0.95) translateY(2px);
+      }
+    }
+
+    .purin-bouncing {
+      animation: purinBounce 0.45s ease;
     }
   </style>
 </head>
@@ -1220,11 +1486,19 @@
 <body>
 
   <div class="container" id="main-container">
-    <!-- 頂部機密專案識別列 -->
+    <!-- 頂部機密專案識別列 (特派布丁狗探員) -->
     <div class="sys-topbar">
-      <span class="sys-id">PROJECT : 1222</span>
-      <span class="sys-status" id="sys-status-badge"><span class="pulse-dot"></span><span
-          id="sys-status-text">ENCRYPTED</span></span>
+      <div class="sys-id-group">
+        <img src="Pudin/pompompurin%20icon.jpg" class="purin-avatar" alt="特派探員布丁狗" title="特派調查員：布丁狗">
+        <div class="sys-id-text-group">
+          <span class="sys-id">PROJECT : 1222</span>
+          <span class="purin-subtag">特派調查員：布丁狗 🍮</span>
+        </div>
+      </div>
+      <span class="sys-status" id="sys-status-badge">
+        <span class="pulse-dot"></span>
+        <span id="sys-status-text">CLASSIFIED</span>
+      </span>
     </div>
 
     <!-- ==================== 關卡 1：實體尋寶＋運算密鑰 ==================== -->
@@ -1241,9 +1515,15 @@
         <div class="code-slot" id="slot-3">#04 [ ? ]</div>
       </div>
 
-      <!-- 偵探線索框 -->
+      <!-- 偵探線索框 (布丁狗特務協助) -->
       <div class="dossier-box">
-        <div class="dossier-header" id="dossier-header">【線索檔案 #01】</div>
+        <div class="dossier-header-bar">
+          <div class="dossier-header" id="dossier-header">【線索檔案 #01】</div>
+          <div class="purin-dossier-badge" title="布丁狗全力搜查中">
+            <img src="Pudin/pompompurin%20clipart.jpg" alt="布丁狗">
+            <span>探員支援中 🍮</span>
+          </div>
+        </div>
         <div class="dossier-text" id="dossier-text"></div>
       </div>
 
@@ -1262,12 +1542,18 @@
       <!-- 一般選擇題容器 -->
       <div id="quiz-options" class="options-list"></div>
 
-      <!-- Q6 終極密碼專用容器 -->
+      <!-- Q6 終極密碼專用容器 (附布丁狗賣力舉重插畫) -->
       <div id="guess-box" style="display: none;">
         <div class="range-badge" id="guess-range">RANGE : 1 ～ 100 HRS</div>
         <input type="text" inputmode="numeric" id="guess-input" class="code-input" autocomplete="off"
           placeholder="點此輸入小時數">
         <button type="button" class="btn" id="guess-submit-btn">送出數值</button>
+
+        <!-- 布丁狗舉重趣味打氣卡片 -->
+        <div class="purin-gym-card">
+          <img src="Pudin/pompompurin%20lifting%20weights.jpg" class="purin-gym-img" alt="賣力舉重的布丁狗">
+          <div class="purin-gym-speech">布丁狗：「工程師寫程式就像在舉重一樣賣力...猜猜看花了幾小時？🍮」</div>
+        </div>
 
         <!-- 猜中後顯示工時證明圖片 -->
         <div id="proof-container" class="proof-box" style="display: none;">
@@ -1283,6 +1569,7 @@
         <!-- 第一幕：抽卡轉盤 -->
         <div id="gacha-step-1">
           <div class="slot-machine-box">
+            <img src="Pudin/660410732876934471.jpg" class="purin-roulette-badge" alt="布丁狗為你加油">
             <div class="slot-reel-label">PRIVILEGE ROULETTE // 1222</div>
             <div class="slot-reel-text" id="slot-reel-text">豪華生日大餐</div>
           </div>
@@ -1319,16 +1606,17 @@
       <div class="feedback-msg" id="quiz-feedback"></div>
     </div>
 
-    <!-- ==================== 關卡 3：記憶時間軸重構 ==================== -->
+    <!-- ==================== 關卡 3：記憶時間軸重構 (拍立得手帳風) ==================== -->
     <div id="stage-3" class="stage">
       <div class="step-badge">PHASE 03 // TIMELINE RECONSTRUCTION</div>
       <h1>記憶時間軸重構</h1>
-      <p class="subtitle">將散落的 20 段時空記憶，依序歸位至 2022 ～ 2026 年份中</p>
+      <p class="subtitle">將散落的 20 段拍立得時空記憶，依序歸位至 2022 ～ 2026 年份公文夾中</p>
 
       <!-- 頂部操作按鈕列 -->
       <div class="stage3-top-actions">
         <button type="button" class="action-chip-btn" id="s3-reset-btn">🔄 重置回待選區</button>
-        <button type="button" class="action-chip-btn hint-btn" id="s3-hint-btn">💡 提示線索 (<span id="s3-hint-count">0</span>/3)</button>
+        <button type="button" class="action-chip-btn hint-btn" id="s3-hint-btn">💡 提示線索 (<span
+            id="s3-hint-count">0</span>/3)</button>
       </div>
 
       <!-- 年份快速跳轉列 -->
@@ -1343,17 +1631,20 @@
 
       <!-- 選取提示懸浮條 (選取照片後出現) -->
       <div class="selected-banner" id="s3-selected-banner" style="display: none;">
-        <span>已選取照片 👆 點擊下方年份即可放入</span>
+        <span>已選取拍立得 👆 點擊下方年份公文夾即可放入</span>
         <span class="selected-banner-cancel" id="s3-cancel-select">取消選取</span>
       </div>
 
-      <!-- 待歸位時空碎片區 (Pool) -->
+      <!-- 待歸位時空碎片區 (Pool - 布丁狗保管) -->
       <div class="pool-card" id="s3-pool-card">
         <div class="pool-header">
-          <span class="pool-title">待歸位記憶碎片</span>
+          <div class="pool-title-group">
+            <img src="Pudin/414612709467758359.jpg" class="purin-pool-sticker" alt="布丁狗保管記憶">
+            <span class="pool-title">待歸位記憶拍立得</span>
+          </div>
           <span class="pool-count-badge" id="s3-pool-count">待歸位：20 張</span>
         </div>
-        <div class="pool-hint-text">點擊選取照片後點選年份，或直接拖曳照片至目標年份：</div>
+        <div class="pool-hint-text">點選拍立得後點擊目標年份，或直接拖曳底片進行歸位：</div>
         <div class="photo-pool-grid" id="s3-photo-pool"></div>
       </div>
 
@@ -1368,16 +1659,17 @@
       <div class="hint-stack" id="s3-hint-stack"></div>
     </div>
 
-    <!-- ==================== 關卡 4：終極機密解密與生日禮物 ==================== -->
+    <!-- ==================== 關卡 4：終極機密解密與生日禮物 (布丁狗慶生特別版) ==================== -->
     <div id="stage-4" class="stage">
-      <div class="step-badge" style="color: #34d399; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);">
+      <div class="step-badge"
+        style="color: #34d399; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);">
         PHASE 04 // MISSION ACCOMPLISHED
       </div>
       <h1>時空時間軸全面同步完成</h1>
       <p class="subtitle">歷經 2022 至 2026，所有記憶碎片已 100% 完美復原！</p>
 
       <div class="stage4-dossier">
-        <div class="dossier-header" style="color: #34d399;">【機密專案結案報告】</div>
+        <div class="dossier-header" style="color: #34d399;">【機密專案結案報告 // APPROVED】</div>
         <div class="dossier-text">
           <b>專案代號：</b>PROJECT : 1222<br>
           <b>特工考核：</b>特級通關（S+）<br>
@@ -1386,34 +1678,48 @@
         </div>
       </div>
 
-      <!-- 禮物解鎖區 -->
+      <!-- 禮物解鎖區 (布丁狗慶生圖樣) -->
       <div class="stage4-gift-box">
-        <div style="font-size: 40px; margin-bottom: 10px;">🎁</div>
-        <h2 style="font-size: 19px; color: #f8fafc; margin-bottom: 8px;">最終藏匿座標已解鎖</h2>
-        <p style="font-size: 13.5px; color: #94a3b8; margin-bottom: 16px;">恭喜通過所有考驗，點擊下方按鈕解密實體禮物領取線索！</p>
-        <button type="button" class="btn" id="open-gift-btn" style="background: linear-gradient(135deg, #10b981, #059669); border-color: rgba(110, 231, 183, 0.5);">
+        <!-- 布丁狗慶生大圖 -->
+        <div class="purin-birthday-box">
+          <img src="Pudin/Pompompurin.jpg" class="purin-birthday-img" alt="布丁狗慶生">
+          <div class="purin-birthday-speech">布丁狗也來為最棒的苑萱慶生啦！祝你生日快樂！🍮🎂🎉</div>
+        </div>
+
+        <h2 style="font-size: 19px; color: #fdfaf5; margin-bottom: 8px;">最終藏匿座標已解鎖</h2>
+        <p style="font-size: 13.5px; color: #aba193; margin-bottom: 16px;">恭喜通過所有考驗，點擊下方按鈕解密實體禮物領取線索！</p>
+        <button type="button" class="btn" id="open-gift-btn"
+          style="background: linear-gradient(135deg, #10b981, #059669); border-color: rgba(110, 231, 183, 0.5);">
           點擊解密生日禮物 🔓
         </button>
 
-        <!-- 禮物內容揭曉 -->
+        <!-- 禮物內容揭曉 (保留 Derrick 給苑萱的真摯文字) -->
         <div class="gift-reveal-card" id="gift-reveal-card">
-          <div class="gift-letter-title">🎂 親愛的女朋友，生日快樂！❤️</div>
+          <div class="gift-letter-title">🎂 親愛的苑萱，生日快樂！❤️</div>
           <div class="gift-letter-body">
             從 2022 年 1 月 9 日到現在，我們一起經歷了好多好多。<br>
             這 20 張照片是我們共同刻下的足跡，每一張都無比珍貴。<br>
-            未來的每一年、每一個生日，我也要繼續牽著你的手一起走下去！
+            未來的每一年、每一個生日，我們也要一起走下去！<br>
+            By the way在做這個的時候，才開始後悔照片拍那麼少:P
           </div>
           <div class="gift-coord-box">
             📍【實體禮物藏匿座標】<br>
-            <span style="font-size: 15.5px; color: #38bdf8;">請轉身給現場的男朋友一個大大的擁抱，並直接向他領取專屬生日禮物吧！🎁</span>
+            <span style="font-size: 15.5px; color: #fbbf24;">系統最終實體封包已成功投遞至外部節點(樓下信箱)，請攜帶鑰匙前往簽收。🎁</span>
           </div>
         </div>
       </div>
 
-      <button type="button" class="btn" id="review-timeline-btn" style="background: #0f172a; border-color: rgba(148, 163, 184, 0.3); color: #cbd5e1; margin-top: 10px;">
+      <button type="button" class="btn" id="review-timeline-btn"
+        style="background: #1e1813; border-color: rgba(217, 119, 6, 0.35); color: #dfd7cc; margin-top: 10px;">
         📷 重溫 20 段時光回憶相簿
       </button>
     </div>
+  </div>
+
+  <!-- 右下角布丁狗互動小彩蛋 -->
+  <div class="purin-floating-badge" id="purin-easter-egg" title="點我一下有驚喜 🍮">
+    <img src="Pudin/1108518895805317272.jpg" class="purin-floating-img" alt="布丁狗彩蛋">
+    <span class="purin-speech-bubble" id="purin-speech">點我一下 🍮</span>
   </div>
 
   <!-- 全螢幕照片預覽 Lightbox Modal -->
@@ -1431,7 +1737,8 @@
         <button type="button" class="lightbox-year-btn" data-year="2024">2024 年</button>
         <button type="button" class="lightbox-year-btn" data-year="2025">2025 年</button>
         <button type="button" class="lightbox-year-btn" data-year="2026">2026 年</button>
-        <button type="button" class="lightbox-year-btn" data-year="pool" style="border-color: rgba(244, 63, 94, 0.4); color: #fda4af;">移回待選區</button>
+        <button type="button" class="lightbox-year-btn" data-year="pool"
+          style="border-color: rgba(244, 63, 94, 0.4); color: #fda4af;">移回待選區</button>
       </div>
     </div>
   </div>
@@ -2046,14 +2353,14 @@
       stage3State.selectedPhotoId = null;
       stage3State.hintLevel = 0;
       stage3State.yearStatus = { 2022: 'pending', 2023: 'pending', 2024: 'pending', 2025: 'pending', 2026: 'pending' };
-      
+
       const feedback = document.getElementById('s3-feedback');
       if (feedback) feedback.textContent = '';
       const stack = document.getElementById('s3-hint-stack');
       if (stack) stack.innerHTML = '';
       const hintCount = document.getElementById('s3-hint-count');
       if (hintCount) hintCount.textContent = '0';
-      
+
       setSelectedPhoto(null);
       renderStage3();
     }
@@ -2303,7 +2610,7 @@
       img.src = `Image/${photo.file}`;
       img.alt = photo.file;
       img.loading = 'lazy';
-      img.onerror = function() {
+      img.onerror = function () {
         if (!this.dataset.triedLower) {
           this.dataset.triedLower = 'true';
           this.src = `image/${photo.file}`;
@@ -2520,7 +2827,7 @@
       const caption = document.getElementById('lightbox-caption');
 
       img.src = `Image/${photo.file}`;
-      img.onerror = function() {
+      img.onerror = function () {
         if (!this.dataset.triedLower) {
           this.dataset.triedLower = 'true';
           this.src = `image/${photo.file}`;
@@ -2651,7 +2958,7 @@
 
       const openGiftBtn = document.getElementById('open-gift-btn');
       if (openGiftBtn) {
-        openGiftBtn.onclick = function() {
+        openGiftBtn.onclick = function () {
           this.style.display = 'none';
           const card = document.getElementById('gift-reveal-card');
           if (card) {
@@ -2666,7 +2973,7 @@
 
       const reviewBtn = document.getElementById('review-timeline-btn');
       if (reviewBtn) {
-        reviewBtn.onclick = function() {
+        reviewBtn.onclick = function () {
           showStage(3);
         };
       }
@@ -2675,11 +2982,11 @@
     // =========================================================
     // 🔧 【開發與測試輔助函式】
     // =========================================================
-    window.debugStage = function(stageNum) {
+    window.debugStage = function (stageNum) {
       showStage(stageNum);
     };
 
-    window.autoSolveStage3 = function() {
+    window.autoSolveStage3 = function () {
       showStage(3);
       for (const yObj of TIMELINE_DATA.years) {
         const yr = yObj.year;
@@ -2691,6 +2998,32 @@
       renderStage3();
       verifyStage3();
     };
+
+    // =========================================================
+    // 🍮 【布丁狗互動小彩蛋邏輯】
+    // =========================================================
+    const purinEgg = document.getElementById('purin-easter-egg');
+    const purinSpeech = document.getElementById('purin-speech');
+    if (purinEgg && purinSpeech) {
+      const purinMessages = [
+        "祝最漂亮的苑萱生日快樂！🍮❤️",
+        "男朋友今天超用心為你準備喔！✨",
+        "今天的你天下第一可愛！🥰",
+        "任務進行得怎麼樣？布丁狗挺你！💪",
+        "悄悄話：禮物在樓下信箱喔！記得帶鑰匙 🔑"
+      ];
+      let msgIdx = 0;
+      purinEgg.addEventListener('click', () => {
+        purinEgg.classList.remove('purin-bouncing');
+        void purinEgg.offsetWidth; // trigger reflow
+        purinEgg.classList.add('purin-bouncing');
+        purinSpeech.textContent = purinMessages[msgIdx];
+        msgIdx = (msgIdx + 1) % purinMessages.length;
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 30, spread: 50, origin: { x: 0.9, y: 0.9 } });
+        }
+      });
+    }
 
     // 檢查網址參數直接測試特定關卡 (例如 ?stage=3 或 ?stage=4)
     const urlParams = new URLSearchParams(window.location.search);
