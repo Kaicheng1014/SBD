@@ -592,6 +592,628 @@
       color: #ffffff;
       font-weight: 700;
     }
+
+    /* ==================== 關卡 3 & 4 樣式 ==================== */
+    .container.stage-3-active,
+    .container.stage-4-active {
+      max-width: 580px;
+      transition: max-width 0.35s ease;
+    }
+
+    /* 年份快速錨點列 */
+    .year-quick-nav {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding: 4px 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .year-nav-pill {
+      flex: 1;
+      min-width: 54px;
+      padding: 6px 3px;
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .year-nav-pill:active,
+    .year-nav-pill.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .year-nav-pill.done {
+      border-color: rgba(16, 185, 129, 0.6);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* 頂部操作按鈕列 (重置 / 提示) */
+    .stage3-top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .action-chip-btn {
+      padding: 6px 12px;
+      background: #080b12;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 6px;
+      color: #cbd5e1;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .action-chip-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .action-chip-btn.hint-btn {
+      border-color: rgba(245, 158, 11, 0.4);
+      color: var(--amber);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    /* 待歸位照片時空碎片區 (Photo Pool) */
+    .pool-card {
+      background: #080b12;
+      border: 1.5px dashed rgba(56, 189, 248, 0.35);
+      border-radius: 14px;
+      padding: 12px 10px;
+      margin-bottom: 16px;
+      text-align: left;
+      position: relative;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .pool-card.drag-over {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .pool-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 0 4px;
+    }
+
+    .pool-title {
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    .pool-count-badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: #7dd3fc;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    .pool-hint-text {
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 8px;
+      padding: 0 4px;
+      line-height: 1.4;
+    }
+
+    .photo-pool-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 4px;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 8px;
+    }
+
+    .pool-empty-state {
+      width: 100%;
+      padding: 18px 12px;
+      text-align: center;
+      color: #34d399;
+      font-size: 13.5px;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.08);
+      border-radius: 10px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    /* 照片項目 (Photo Item) */
+    .photo-item {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      background: #000000;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      flex-shrink: 0;
+    }
+
+    .photo-item:active {
+      cursor: grabbing;
+    }
+
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      background: #080b12;
+    }
+
+    /* 選取狀態：點擊選中時發光 */
+    .photo-item.selected {
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.85);
+      transform: scale(1.05);
+      z-index: 10;
+    }
+
+    /* 提示狀態：放錯年份高亮 */
+    .photo-item.wrong-year-hint {
+      border-color: #f43f5e !important;
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.7);
+    }
+
+    /* 拖曳中半透明 */
+    .photo-item.dragging {
+      opacity: 0.4;
+      transform: scale(0.92);
+    }
+
+    .photo-item .preview-trigger {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 20px;
+      height: 20px;
+      background: rgba(15, 23, 42, 0.8);
+      color: #ffffff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      cursor: pointer;
+      opacity: 0.85;
+      z-index: 5;
+    }
+
+    .photo-item .preview-trigger:hover {
+      opacity: 1;
+      background: var(--primary);
+      color: #000;
+    }
+
+    /* 日期解鎖標籤 (Hint 3) */
+    .photo-date-badge {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: #38bdf8;
+      font-family: "SF Mono", monospace;
+      font-size: 9px;
+      text-align: center;
+      padding: 1.5px 0;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    /* 年份軌道容器 (Year Track Card) */
+    .year-tracks-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .year-track-card {
+      background: #0d131f;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: left;
+      transition: all 0.25s;
+      position: relative;
+    }
+
+    .year-track-card.drag-over {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.08);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+    }
+
+    .year-track-card.target-year-ready {
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+
+    /* 年份已驗證正確 (完美綠色發光) */
+    .year-track-card.status-correct {
+      border-color: rgba(16, 185, 129, 0.65);
+      background: rgba(16, 185, 129, 0.06);
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
+    }
+
+    /* 年份驗證有誤 (橘紅警示) */
+    .year-track-card.status-error {
+      border-color: rgba(244, 63, 94, 0.6);
+      background: rgba(244, 63, 94, 0.05);
+    }
+
+    .year-track-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .year-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .year-title {
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: 0.5px;
+    }
+
+    .year-target-count {
+      font-size: 11.5px;
+      font-family: "SF Mono", monospace;
+      color: var(--sub);
+      background: #080b12;
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .year-status-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 6px;
+      color: var(--sub);
+      background: rgba(148, 163, 184, 0.1);
+    }
+
+    .year-track-card.status-correct .year-status-badge {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .year-track-card.status-error .year-status-badge {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fb7185;
+    }
+
+    /* 年份放置槽 (Slots) */
+    .year-slots-area {
+      min-height: 86px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 6px;
+      background: #080c14;
+      border-radius: 10px;
+      border: 1px dashed rgba(148, 163, 184, 0.25);
+      position: relative;
+    }
+
+    .year-empty-hint {
+      width: 100%;
+      text-align: center;
+      font-size: 12.5px;
+      color: #64748b;
+      padding: 16px 8px;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    /* 年份內已放置的照片卡片 (包含序號與快速調整按鈕) */
+    .placed-photo-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      padding: 4px;
+      gap: 3px;
+    }
+
+    .placed-order-badge {
+      font-family: "SF Mono", monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.15);
+      padding: 1px 6px;
+      border-radius: 4px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .placed-controls {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      width: 100%;
+      margin-top: 2px;
+    }
+
+    .ctrl-mini-btn {
+      flex: 1;
+      padding: 3px 0;
+      background: #1e293b;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 4px;
+      color: #94a3b8;
+      font-size: 10.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .ctrl-mini-btn:hover {
+      background: var(--primary);
+      color: #000000;
+    }
+
+    .ctrl-mini-btn.remove-btn:hover {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    /* 懸浮快速放置提示列 */
+    .selected-banner {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #7dd3fc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .selected-banner-cancel {
+      font-size: 11.5px;
+      color: #cbd5e1;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* 照片全螢幕預覽 Lightbox Modal */
+    .lightbox-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .lightbox-content {
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 16px;
+      padding: 18px 16px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    .lightbox-img-box {
+      width: 100%;
+      max-height: 52vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #000000;
+      margin-bottom: 12px;
+    }
+
+    .lightbox-img-box img {
+      max-width: 100%;
+      max-height: 52vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .lightbox-caption {
+      font-family: "SF Mono", monospace;
+      font-size: 13.5px;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .lightbox-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .lightbox-year-btn {
+      padding: 8px 12px;
+      background: #1e293b;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-family: "SF Mono", monospace;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lightbox-year-btn:hover,
+    .lightbox-year-btn:active {
+      background: var(--primary);
+      color: #000;
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 26px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    /* 關卡 4 (通關獎勵 / 禮物解密) */
+    .stage4-dossier {
+      background: #0a0e17;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 14px;
+      padding: 18px 16px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .stage4-gift-box {
+      background: radial-gradient(circle at center, rgba(56, 189, 248, 0.15), transparent 70%), #0a0e17;
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 24px 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.25);
+      text-align: center;
+    }
+
+    .gift-reveal-card {
+      display: none;
+      background: #080b12;
+      border: 1.5px solid rgba(16, 185, 129, 0.5);
+      border-radius: 12px;
+      padding: 20px 16px;
+      margin-top: 16px;
+      text-align: left;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .gift-letter-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #34d399;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .gift-letter-body {
+      font-size: 14.5px;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+
+    .gift-coord-box {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14.5px;
+      color: #f8fafc;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* 手機觸控拖曳浮動殘影 */
+    .touch-drag-ghost {
+      position: fixed;
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(56, 189, 248, 0.6);
+      pointer-events: none;
+      z-index: 10000;
+      opacity: 0.9;
+      transform: translate(-50%, -50%);
+    }
+
+    .touch-drag-ghost img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   </style>
 </head>
 
@@ -697,11 +1319,120 @@
       <div class="feedback-msg" id="quiz-feedback"></div>
     </div>
 
-    <!-- ==================== 關卡 3 預留過渡畫面 ==================== -->
+    <!-- ==================== 關卡 3：記憶時間軸重構 ==================== -->
     <div id="stage-3" class="stage">
-      <div class="step-badge">PHASE 02 // VERIFIED</div>
-      <h1>身份同步驗證通過</h1>
-      <p class="subtitle">第一、二階段安全鎖已解除。準備好進入「記憶時間軸」與「最終藏匿座標」了嗎？</p>
+      <div class="step-badge">PHASE 03 // TIMELINE RECONSTRUCTION</div>
+      <h1>記憶時間軸重構</h1>
+      <p class="subtitle">將散落的 20 段時空記憶，依序歸位至 2022 ～ 2026 年份中</p>
+
+      <!-- 頂部操作按鈕列 -->
+      <div class="stage3-top-actions">
+        <button type="button" class="action-chip-btn" id="s3-reset-btn">🔄 重置回待選區</button>
+        <button type="button" class="action-chip-btn hint-btn" id="s3-hint-btn">💡 提示線索 (<span id="s3-hint-count">0</span>/3)</button>
+      </div>
+
+      <!-- 年份快速跳轉列 -->
+      <div class="year-quick-nav" id="year-quick-nav">
+        <button type="button" class="year-nav-pill active" data-target="all">全部</button>
+        <button type="button" class="year-nav-pill" data-target="year-card-2022" id="nav-pill-2022">2022</button>
+        <button type="button" class="year-nav-pill" data-target="year-card-2023" id="nav-pill-2023">2023</button>
+        <button type="button" class="year-nav-pill" data-target="year-card-2024" id="nav-pill-2024">2024</button>
+        <button type="button" class="year-nav-pill" data-target="year-card-2025" id="nav-pill-2025">2025</button>
+        <button type="button" class="year-nav-pill" data-target="year-card-2026" id="nav-pill-2026">2026</button>
+      </div>
+
+      <!-- 選取提示懸浮條 (選取照片後出現) -->
+      <div class="selected-banner" id="s3-selected-banner" style="display: none;">
+        <span>已選取照片 👆 點擊下方年份即可放入</span>
+        <span class="selected-banner-cancel" id="s3-cancel-select">取消選取</span>
+      </div>
+
+      <!-- 待歸位時空碎片區 (Pool) -->
+      <div class="pool-card" id="s3-pool-card">
+        <div class="pool-header">
+          <span class="pool-title">待歸位記憶碎片</span>
+          <span class="pool-count-badge" id="s3-pool-count">待歸位：20 張</span>
+        </div>
+        <div class="pool-hint-text">點擊選取照片後點選年份，或直接拖曳照片至目標年份：</div>
+        <div class="photo-pool-grid" id="s3-photo-pool"></div>
+      </div>
+
+      <!-- 5 年份軌道容器 -->
+      <div class="year-tracks-container" id="s3-year-tracks">
+        <!-- 由 JavaScript 動態渲染 2022 ~ 2026 軌道卡片 -->
+      </div>
+
+      <!-- 驗證按鈕與回饋 -->
+      <button type="button" class="btn" id="s3-verify-btn">驗證記憶時間軸</button>
+      <div class="feedback-msg" id="s3-feedback"></div>
+      <div class="hint-stack" id="s3-hint-stack"></div>
+    </div>
+
+    <!-- ==================== 關卡 4：終極機密解密與生日禮物 ==================== -->
+    <div id="stage-4" class="stage">
+      <div class="step-badge" style="color: #34d399; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);">
+        PHASE 04 // MISSION ACCOMPLISHED
+      </div>
+      <h1>時空時間軸全面同步完成</h1>
+      <p class="subtitle">歷經 2022 至 2026，所有記憶碎片已 100% 完美復原！</p>
+
+      <div class="stage4-dossier">
+        <div class="dossier-header" style="color: #34d399;">【機密專案結案報告】</div>
+        <div class="dossier-text">
+          <b>專案代號：</b>PROJECT : 1222<br>
+          <b>特工考核：</b>特級通關（S+）<br>
+          <b>時間紀錄：</b>從 2022.01.09 相遇至今，跨越 1,800+ 天<br>
+          <b>回憶拼合：</b>20 段時空照片已依序鎖定歸位！
+        </div>
+      </div>
+
+      <!-- 禮物解鎖區 -->
+      <div class="stage4-gift-box">
+        <div style="font-size: 40px; margin-bottom: 10px;">🎁</div>
+        <h2 style="font-size: 19px; color: #f8fafc; margin-bottom: 8px;">最終藏匿座標已解鎖</h2>
+        <p style="font-size: 13.5px; color: #94a3b8; margin-bottom: 16px;">恭喜通過所有考驗，點擊下方按鈕解密實體禮物領取線索！</p>
+        <button type="button" class="btn" id="open-gift-btn" style="background: linear-gradient(135deg, #10b981, #059669); border-color: rgba(110, 231, 183, 0.5);">
+          點擊解密生日禮物 🔓
+        </button>
+
+        <!-- 禮物內容揭曉 -->
+        <div class="gift-reveal-card" id="gift-reveal-card">
+          <div class="gift-letter-title">🎂 親愛的女朋友，生日快樂！❤️</div>
+          <div class="gift-letter-body">
+            從 2022 年 1 月 9 日到現在，我們一起經歷了好多好多。<br>
+            這 20 張照片是我們共同刻下的足跡，每一張都無比珍貴。<br>
+            未來的每一年、每一個生日，我也要繼續牽著你的手一起走下去！
+          </div>
+          <div class="gift-coord-box">
+            📍【實體禮物藏匿座標】<br>
+            <span style="font-size: 15.5px; color: #38bdf8;">請轉身給現場的男朋友一個大大的擁抱，並直接向他領取專屬生日禮物吧！🎁</span>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn" id="review-timeline-btn" style="background: #0f172a; border-color: rgba(148, 163, 184, 0.3); color: #cbd5e1; margin-top: 10px;">
+        📷 重溫 20 段時光回憶相簿
+      </button>
+    </div>
+  </div>
+
+  <!-- 全螢幕照片預覽 Lightbox Modal -->
+  <div class="lightbox-modal" id="lightbox-modal">
+    <div class="lightbox-content">
+      <button type="button" class="lightbox-close-btn" id="lightbox-close-btn">×</button>
+      <div class="lightbox-img-box">
+        <img id="lightbox-img" src="" alt="時光照片">
+      </div>
+      <div class="lightbox-caption" id="lightbox-caption">時空記憶片段</div>
+      <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">快速放置到指定年份：</div>
+      <div class="lightbox-actions" id="lightbox-actions">
+        <button type="button" class="lightbox-year-btn" data-year="2022">2022 年</button>
+        <button type="button" class="lightbox-year-btn" data-year="2023">2023 年</button>
+        <button type="button" class="lightbox-year-btn" data-year="2024">2024 年</button>
+        <button type="button" class="lightbox-year-btn" data-year="2025">2025 年</button>
+        <button type="button" class="lightbox-year-btn" data-year="2026">2026 年</button>
+        <button type="button" class="lightbox-year-btn" data-year="pool" style="border-color: rgba(244, 63, 94, 0.4); color: #fda4af;">移回待選區</button>
+      </div>
     </div>
   </div>
 
@@ -831,7 +1562,24 @@
 
     function showStage(num) {
       document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
-      document.getElementById(`stage-${num}`).classList.add('active');
+      const target = document.getElementById(`stage-${num}`);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      const container = document.getElementById('main-container');
+      if (num === 3) {
+        container.classList.add('stage-3-active');
+        container.classList.remove('stage-4-active');
+        initStage3();
+      } else if (num === 4) {
+        container.classList.remove('stage-3-active');
+        container.classList.add('stage-4-active');
+        initStage4();
+      } else {
+        container.classList.remove('stage-3-active');
+        container.classList.remove('stage-4-active');
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1227,8 +1975,731 @@
       }
     }
 
-    // 初始化第一關
-    renderStage1();
+    // =========================================================
+    // 🔧 【關卡 3 & 4：記憶時間軸重構 與 最終禮物解密】
+    // =========================================================
+    const TIMELINE_DATA = {
+      years: [
+        { year: 2022, targetCount: 6, photos: ["20220101.jpg", "20220123.jpg", "20220228.jpg", "20220328.jpg", "20220607.jpg", "20220710.png"] },
+        { year: 2023, targetCount: 3, photos: ["20230302.jpg", "20230604.jpg", "20231125.jpg"] },
+        { year: 2024, targetCount: 4, photos: ["20240110.jpg", "20240215.jpg", "20241026.png", "20241222.png"] },
+        { year: 2025, targetCount: 5, photos: ["20250316.jpg", "20250329.png", "20250512.png", "20250715.jpg", "20251001.jpg"] },
+        { year: 2026, targetCount: 2, photos: ["20260516.jpg", "20261027.jpg"] }
+      ],
+      allPhotos: [
+        { id: "20220101", file: "20220101.jpg", year: 2022, date: "2022.01.01" },
+        { id: "20220123", file: "20220123.jpg", year: 2022, date: "2022.01.23" },
+        { id: "20220228", file: "20220228.jpg", year: 2022, date: "2022.02.28" },
+        { id: "20220328", file: "20220328.jpg", year: 2022, date: "2022.03.28" },
+        { id: "20220607", file: "20220607.jpg", year: 2022, date: "2022.06.07" },
+        { id: "20220710", file: "20220710.png", year: 2022, date: "2022.07.10" },
+        { id: "20230302", file: "20230302.jpg", year: 2023, date: "2023.03.02" },
+        { id: "20230604", file: "20230604.jpg", year: 2023, date: "2023.06.04" },
+        { id: "20231125", file: "20231125.jpg", year: 2023, date: "2023.11.25" },
+        { id: "20240110", file: "20240110.jpg", year: 2024, date: "2024.01.10" },
+        { id: "20240215", file: "20240215.jpg", year: 2024, date: "2024.02.15" },
+        { id: "20241026", file: "20241026.png", year: 2024, date: "2024.10.26" },
+        { id: "20241222", file: "20241222.png", year: 2024, date: "2024.12.22" },
+        { id: "20250316", file: "20250316.jpg", year: 2025, date: "2025.03.16" },
+        { id: "20250329", file: "20250329.png", year: 2025, date: "2025.03.29" },
+        { id: "20250512", file: "20250512.png", year: 2025, date: "2025.05.12" },
+        { id: "20250715", file: "20250715.jpg", year: 2025, date: "2025.07.15" },
+        { id: "20251001", file: "20251001.jpg", year: 2025, date: "2025.10.01" },
+        { id: "20260516", file: "20260516.jpg", year: 2026, date: "2026.05.16" },
+        { id: "20261027", file: "20261027.jpg", year: 2026, date: "2026.10.27" }
+      ]
+    };
+
+    function getPhoto(id) {
+      return TIMELINE_DATA.allPhotos.find(p => p.id === id);
+    }
+
+    let stage3State = {
+      initialized: false,
+      eventsBound: false,
+      pool: [],
+      years: { 2022: [], 2023: [], 2024: [], 2025: [], 2026: [] },
+      selectedPhotoId: null,
+      hintLevel: 0,
+      yearStatus: { 2022: 'pending', 2023: 'pending', 2024: 'pending', 2025: 'pending', 2026: 'pending' },
+      previewingPhotoId: null
+    };
+
+    function initStage3(forceReset = false) {
+      if (stage3State.initialized && !forceReset) {
+        renderStage3();
+        return;
+      }
+      stage3State.initialized = true;
+      resetStage3();
+      if (!stage3State.eventsBound) {
+        bindStage3StaticEvents();
+        stage3State.eventsBound = true;
+      }
+    }
+
+    function resetStage3() {
+      // 隨機打散 20 張照片
+      const shuffled = [...TIMELINE_DATA.allPhotos].map(p => p.id).sort(() => Math.random() - 0.5);
+      stage3State.pool = shuffled;
+      stage3State.years = { 2022: [], 2023: [], 2024: [], 2025: [], 2026: [] };
+      stage3State.selectedPhotoId = null;
+      stage3State.hintLevel = 0;
+      stage3State.yearStatus = { 2022: 'pending', 2023: 'pending', 2024: 'pending', 2025: 'pending', 2026: 'pending' };
+      
+      const feedback = document.getElementById('s3-feedback');
+      if (feedback) feedback.textContent = '';
+      const stack = document.getElementById('s3-hint-stack');
+      if (stack) stack.innerHTML = '';
+      const hintCount = document.getElementById('s3-hint-count');
+      if (hintCount) hintCount.textContent = '0';
+      
+      setSelectedPhoto(null);
+      renderStage3();
+    }
+
+    function setSelectedPhoto(id) {
+      stage3State.selectedPhotoId = id;
+      const banner = document.getElementById('s3-selected-banner');
+      if (banner) {
+        banner.style.display = id ? 'flex' : 'none';
+      }
+      document.querySelectorAll('.year-track-card').forEach(el => {
+        if (id) {
+          el.classList.add('target-year-ready');
+        } else {
+          el.classList.remove('target-year-ready');
+        }
+      });
+      document.querySelectorAll('.photo-item').forEach(el => {
+        if (el.dataset.id === id) {
+          el.classList.add('selected');
+        } else {
+          el.classList.remove('selected');
+        }
+      });
+    }
+
+    function movePhotoToYear(photoId, targetYear, targetIndex = null) {
+      if (!photoId) return;
+      // 從待選池中移除
+      stage3State.pool = stage3State.pool.filter(id => id !== photoId);
+      // 從所有年份中移除
+      for (const yr of [2022, 2023, 2024, 2025, 2026]) {
+        stage3State.years[yr] = stage3State.years[yr].filter(id => id !== photoId);
+      }
+
+      // 放入目標位置
+      if (targetYear === 'pool') {
+        stage3State.pool.push(photoId);
+      } else {
+        const yrNum = parseInt(targetYear, 10);
+        if (targetIndex !== null && targetIndex >= 0) {
+          stage3State.years[yrNum].splice(targetIndex, 0, photoId);
+        } else {
+          stage3State.years[yrNum].push(photoId);
+        }
+        stage3State.yearStatus[yrNum] = 'pending';
+      }
+
+      setSelectedPhoto(null);
+      renderStage3();
+    }
+
+    function reorderPhotoInYear(year, fromIndex, toIndex) {
+      const list = stage3State.years[year];
+      if (fromIndex < 0 || fromIndex >= list.length || toIndex < 0 || toIndex >= list.length) return;
+      const [item] = list.splice(fromIndex, 1);
+      list.splice(toIndex, 0, item);
+      stage3State.yearStatus[year] = 'pending';
+      renderStage3();
+    }
+
+    // 渲染關卡 3 畫面
+    function renderStage3() {
+      // 1. 待歸位碎片池
+      const poolGrid = document.getElementById('s3-photo-pool');
+      const poolCountEl = document.getElementById('s3-pool-count');
+      if (poolCountEl) {
+        poolCountEl.textContent = `待歸位：${stage3State.pool.length} 張`;
+      }
+
+      if (poolGrid) {
+        poolGrid.innerHTML = '';
+        if (stage3State.pool.length === 0) {
+          poolGrid.innerHTML = '<div class="pool-empty-state">🎉 20 張照片已全部放入年份！請點擊下方「驗證記憶時間軸」檢查順序。</div>';
+        } else {
+          stage3State.pool.forEach(photoId => {
+            const photo = getPhoto(photoId);
+            if (!photo) return;
+            const itemEl = createPhotoItemEl(photo, false);
+            poolGrid.appendChild(itemEl);
+          });
+        }
+      }
+
+      // 2. 年份軌道容器
+      const tracksContainer = document.getElementById('s3-year-tracks');
+      if (tracksContainer) {
+        tracksContainer.innerHTML = '';
+        TIMELINE_DATA.years.forEach(yObj => {
+          const yr = yObj.year;
+          const targetCount = yObj.targetCount;
+          const currentPhotos = stage3State.years[yr];
+          const currCount = currentPhotos.length;
+          const status = stage3State.yearStatus[yr];
+
+          const card = document.createElement('div');
+          card.className = `year-track-card ${status === 'correct' ? 'status-correct' : status === 'error' ? 'status-error' : ''}`;
+          card.id = `year-card-${yr}`;
+          card.dataset.year = yr;
+
+          let statusText = `待歸位 (${currCount}/${targetCount})`;
+          if (status === 'correct') {
+            statusText = `✅ 完美匹配 (${currCount}/${targetCount})`;
+          } else if (status === 'error') {
+            statusText = `⚠️ 待調整 (${currCount}/${targetCount})`;
+          }
+
+          // 年份卡片標題
+          card.innerHTML = `
+            <div class="year-track-header">
+              <div class="year-title-group">
+                <span class="year-title">📅 ${yr} 年</span>
+                <span class="year-target-count">${currCount} / ${targetCount} 張</span>
+              </div>
+              <span class="year-status-badge">${statusText}</span>
+            </div>
+            <div class="year-slots-area" id="slots-${yr}" data-year="${yr}"></div>
+          `;
+
+          const slotsArea = card.querySelector(`#slots-${yr}`);
+
+          if (currCount === 0) {
+            slotsArea.innerHTML = `<div class="year-empty-hint">點選照片後點擊此處放入 ${yr} 年，或直接拖曳至此</div>`;
+          } else {
+            currentPhotos.forEach((photoId, idx) => {
+              const photo = getPhoto(photoId);
+              if (!photo) return;
+
+              const placedCard = document.createElement('div');
+              placedCard.className = 'placed-photo-card';
+
+              // 序號
+              const orderBadge = document.createElement('div');
+              orderBadge.className = 'placed-order-badge';
+              orderBadge.textContent = `#${idx + 1}`;
+              placedCard.appendChild(orderBadge);
+
+              // 照片元件
+              const isWrongYear = (stage3State.hintLevel >= 2 && photo.year !== yr);
+              const photoEl = createPhotoItemEl(photo, isWrongYear);
+              placedCard.appendChild(photoEl);
+
+              // 快速微調按鈕
+              const controls = document.createElement('div');
+              controls.className = 'placed-controls';
+
+              if (idx > 0) {
+                const leftBtn = document.createElement('button');
+                leftBtn.type = 'button';
+                leftBtn.className = 'ctrl-mini-btn';
+                leftBtn.textContent = '◀';
+                leftBtn.title = '向前移';
+                leftBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  reorderPhotoInYear(yr, idx, idx - 1);
+                });
+                controls.appendChild(leftBtn);
+              }
+
+              if (idx < currCount - 1) {
+                const rightBtn = document.createElement('button');
+                rightBtn.type = 'button';
+                rightBtn.className = 'ctrl-mini-btn';
+                rightBtn.textContent = '▶';
+                rightBtn.title = '向後移';
+                rightBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  reorderPhotoInYear(yr, idx, idx + 1);
+                });
+                controls.appendChild(rightBtn);
+              }
+
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.className = 'ctrl-mini-btn remove-btn';
+              removeBtn.textContent = '✕';
+              removeBtn.title = '移回待選池';
+              removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                movePhotoToYear(photoId, 'pool');
+              });
+              controls.appendChild(removeBtn);
+
+              placedCard.appendChild(controls);
+              slotsArea.appendChild(placedCard);
+            });
+          }
+
+          // 拖曳放置目標事件 (HTML5 Drag & Drop)
+          card.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            card.classList.add('drag-over');
+          });
+          card.addEventListener('dragleave', () => {
+            card.classList.remove('drag-over');
+          });
+          card.addEventListener('drop', (e) => {
+            e.preventDefault();
+            card.classList.remove('drag-over');
+            const photoId = e.dataTransfer.getData('text/plain');
+            if (photoId) {
+              movePhotoToYear(photoId, yr);
+            }
+          });
+
+          // 點選放置：若有選取中的照片，點擊該年份卡片即放入
+          card.addEventListener('click', () => {
+            if (stage3State.selectedPhotoId) {
+              movePhotoToYear(stage3State.selectedPhotoId, yr);
+            }
+          });
+
+          tracksContainer.appendChild(card);
+        });
+      }
+
+      // 更新快速跳轉按鈕的狀態
+      TIMELINE_DATA.years.forEach(yObj => {
+        const yr = yObj.year;
+        const pill = document.getElementById(`nav-pill-${yr}`);
+        if (pill) {
+          if (stage3State.yearStatus[yr] === 'correct') {
+            pill.classList.add('done');
+          } else {
+            pill.classList.remove('done');
+          }
+        }
+      });
+    }
+
+    // 建立單個照片元件
+    function createPhotoItemEl(photo, isWrongYear = false) {
+      const item = document.createElement('div');
+      item.className = 'photo-item';
+      item.dataset.id = photo.id;
+      item.draggable = true;
+
+      if (stage3State.selectedPhotoId === photo.id) {
+        item.classList.add('selected');
+      }
+      if (isWrongYear) {
+        item.classList.add('wrong-year-hint');
+      }
+
+      // 縮圖 (若 Image/ 載入失敗則自動嘗試 image/)
+      const img = document.createElement('img');
+      img.src = `Image/${photo.file}`;
+      img.alt = photo.file;
+      img.loading = 'lazy';
+      img.onerror = function() {
+        if (!this.dataset.triedLower) {
+          this.dataset.triedLower = 'true';
+          this.src = `image/${photo.file}`;
+        }
+      };
+      item.appendChild(img);
+
+      // Level 3 提示：照片下方顯示精確日期
+      if (stage3State.hintLevel >= 3) {
+        const dateBadge = document.createElement('div');
+        dateBadge.className = 'photo-date-badge';
+        dateBadge.textContent = photo.date;
+        item.appendChild(dateBadge);
+      }
+
+      // 右上角全螢幕預覽放大鏡圖示
+      const previewTrigger = document.createElement('div');
+      previewTrigger.className = 'preview-trigger';
+      previewTrigger.innerHTML = '🔍';
+      previewTrigger.title = '放大預覽照片';
+      previewTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openLightbox(photo.id);
+      });
+      item.appendChild(previewTrigger);
+
+      // 點擊切換選取狀態
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (stage3State.selectedPhotoId === photo.id) {
+          setSelectedPhoto(null);
+        } else {
+          setSelectedPhoto(photo.id);
+        }
+      });
+
+      // HTML5 Drag Events
+      item.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', photo.id);
+        item.classList.add('dragging');
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+      });
+
+      // Mobile Touch Drag Events
+      item.addEventListener('touchstart', (e) => handleTouchStart(e, photo.id), { passive: true });
+
+      return item;
+    }
+
+    // 觸控拖曳 (Touch Drag for Mobile)
+    let touchDragInfo = null;
+    let touchGhostEl = null;
+
+    function handleTouchStart(e, photoId) {
+      const touch = e.touches[0];
+      touchDragInfo = {
+        photoId: photoId,
+        startX: touch.clientX,
+        startY: touch.clientY,
+        isDragging: false
+      };
+    }
+
+    document.addEventListener('touchmove', (e) => {
+      if (!touchDragInfo) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - touchDragInfo.startX;
+      const dy = touch.clientY - touchDragInfo.startY;
+
+      if (!touchDragInfo.isDragging && (Math.abs(dx) > 9 || Math.abs(dy) > 9)) {
+        touchDragInfo.isDragging = true;
+        const photo = getPhoto(touchDragInfo.photoId);
+        if (photo) {
+          touchGhostEl = document.createElement('div');
+          touchGhostEl.className = 'touch-drag-ghost';
+          touchGhostEl.innerHTML = `<img src="Image/${photo.file}">`;
+          document.body.appendChild(touchGhostEl);
+        }
+      }
+
+      if (touchDragInfo.isDragging && touchGhostEl) {
+        if (e.cancelable) e.preventDefault();
+        touchGhostEl.style.left = `${touch.clientX}px`;
+        touchGhostEl.style.top = `${touch.clientY}px`;
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+      if (!touchDragInfo) return;
+      if (touchDragInfo.isDragging && touchGhostEl) {
+        const touch = e.changedTouches[0];
+        touchGhostEl.remove();
+        touchGhostEl = null;
+
+        const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (elemBelow) {
+          const yearCard = elemBelow.closest('.year-track-card');
+          const poolCard = elemBelow.closest('.pool-card');
+          if (yearCard && yearCard.dataset.year) {
+            movePhotoToYear(touchDragInfo.photoId, parseInt(yearCard.dataset.year, 10));
+          } else if (poolCard) {
+            movePhotoToYear(touchDragInfo.photoId, 'pool');
+          }
+        }
+      }
+      touchDragInfo = null;
+    });
+
+    // 綁定關卡 3 靜態事件
+    function bindStage3StaticEvents() {
+      // 待選池 Drag & Drop 目標
+      const poolCard = document.getElementById('s3-pool-card');
+      if (poolCard) {
+        poolCard.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          poolCard.classList.add('drag-over');
+        });
+        poolCard.addEventListener('dragleave', () => {
+          poolCard.classList.remove('drag-over');
+        });
+        poolCard.addEventListener('drop', (e) => {
+          e.preventDefault();
+          poolCard.classList.remove('drag-over');
+          const photoId = e.dataTransfer.getData('text/plain');
+          if (photoId) {
+            movePhotoToYear(photoId, 'pool');
+          }
+        });
+      }
+
+      // 重置按鈕
+      const resetBtn = document.getElementById('s3-reset-btn');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (confirm('確定要將所有照片重置回待選區嗎？')) {
+            resetStage3();
+          }
+        });
+      }
+
+      // 提示線索按鈕
+      const hintBtn = document.getElementById('s3-hint-btn');
+      if (hintBtn) {
+        hintBtn.addEventListener('click', triggerStage3Hint);
+      }
+
+      // 驗證按鈕
+      const verifyBtn = document.getElementById('s3-verify-btn');
+      if (verifyBtn) {
+        verifyBtn.addEventListener('click', verifyStage3);
+      }
+
+      // 取消選取懸浮條
+      const cancelSelect = document.getElementById('s3-cancel-select');
+      if (cancelSelect) {
+        cancelSelect.addEventListener('click', () => setSelectedPhoto(null));
+      }
+
+      // 年份快速導覽
+      const quickNav = document.getElementById('year-quick-nav');
+      if (quickNav) {
+        quickNav.addEventListener('click', (e) => {
+          const btn = e.target.closest('.year-nav-pill');
+          if (!btn) return;
+          quickNav.querySelectorAll('.year-nav-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const target = btn.dataset.target;
+          if (target === 'all') {
+            document.getElementById('s3-pool-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            const card = document.getElementById(target);
+            if (card) {
+              card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+        });
+      }
+
+      // Lightbox 事件
+      const lightboxModal = document.getElementById('lightbox-modal');
+      const lightboxClose = document.getElementById('lightbox-close-btn');
+      if (lightboxClose) {
+        lightboxClose.addEventListener('click', closeLightbox);
+      }
+      if (lightboxModal) {
+        lightboxModal.addEventListener('click', (e) => {
+          if (e.target === lightboxModal) closeLightbox();
+        });
+      }
+
+      // Lightbox 快速歸位按鈕
+      document.querySelectorAll('.lightbox-year-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const yr = btn.dataset.year;
+          if (stage3State.previewingPhotoId) {
+            movePhotoToYear(stage3State.previewingPhotoId, yr);
+            closeLightbox();
+          }
+        });
+      });
+    }
+
+    // Lightbox Modal
+    function openLightbox(photoId) {
+      const photo = getPhoto(photoId);
+      if (!photo) return;
+      stage3State.previewingPhotoId = photoId;
+
+      const modal = document.getElementById('lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+
+      img.src = `Image/${photo.file}`;
+      img.onerror = function() {
+        if (!this.dataset.triedLower) {
+          this.dataset.triedLower = 'true';
+          this.src = `image/${photo.file}`;
+        }
+      };
+
+      if (stage3State.hintLevel >= 3) {
+        caption.textContent = `記憶時空標記：${photo.date} (${photo.year} 年)`;
+      } else {
+        caption.textContent = `時空記憶碎片 #${photoId.slice(-4)}`;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById('lightbox-modal');
+      if (modal) modal.classList.remove('active');
+      stage3State.previewingPhotoId = null;
+    }
+
+    // 累積提示邏輯
+    function triggerStage3Hint() {
+      if (stage3State.hintLevel >= 3) {
+        alert("所有提示已全數解鎖囉！每張照片下方已顯示精確拍攝日期。");
+        return;
+      }
+      stage3State.hintLevel++;
+      document.getElementById('s3-hint-count').textContent = stage3State.hintLevel;
+
+      const stack = document.getElementById('s3-hint-stack');
+      const item = document.createElement('div');
+      item.className = 'hint-item';
+
+      if (stage3State.hintLevel === 1) {
+        item.innerHTML = `<span class="hint-level">Level 1 提示：</span>各年份照片配額為：2022(6張)、2023(3張)、2024(4張)、2025(5張)、2026(2張)。`;
+      } else if (stage3State.hintLevel === 2) {
+        item.innerHTML = `<span class="hint-level">Level 2 提示：</span>時空雷達已啟動！若照片放在錯誤的年份，會被標記為紅色邊框！`;
+      } else if (stage3State.hintLevel === 3) {
+        item.innerHTML = `<span class="hint-level">Level 3 提示：</span>時空戳記全解鎖！每張照片下方已直接顯示拍攝日期（例如 2022.01.01），依日期從小到大排就對啦！`;
+      }
+
+      stack.appendChild(item);
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      renderStage3();
+    }
+
+    // 驗證記憶時間軸
+    function verifyStage3() {
+      const feedback = document.getElementById('s3-feedback');
+      const placedCount = 20 - stage3State.pool.length;
+
+      if (placedCount < 20) {
+        feedback.className = 'feedback-msg';
+        feedback.textContent = `還有 ${20 - placedCount} 張照片在待歸位區尚未安排喔！先把所有照片放到年份裡吧～`;
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+
+      let allCorrect = true;
+      let correctYearsCount = 0;
+      const errorNotes = [];
+
+      for (const yObj of TIMELINE_DATA.years) {
+        const yr = yObj.year;
+        const targetList = yObj.photos; // 依時間排序之檔名列表
+        const currentIds = stage3State.years[yr];
+        const currentFiles = currentIds.map(id => getPhoto(id).file);
+
+        if (currentFiles.length !== targetList.length) {
+          allCorrect = false;
+          stage3State.yearStatus[yr] = 'error';
+          errorNotes.push(`${yr} 年照片數量不符（目前 ${currentFiles.length} 張，應為 ${targetList.length} 張）`);
+        } else {
+          // 檢查照片是否完全符合且順序正確
+          const isIdentical = currentFiles.every((f, i) => f === targetList[i]);
+          if (isIdentical) {
+            stage3State.yearStatus[yr] = 'correct';
+            correctYearsCount++;
+          } else {
+            allCorrect = false;
+            stage3State.yearStatus[yr] = 'error';
+            const allBelongToYear = currentIds.every(id => getPhoto(id).year === yr);
+            if (allBelongToYear) {
+              errorNotes.push(`${yr} 年照片全對，但順序有誤，再微調一下前後順序喔！`);
+            } else {
+              errorNotes.push(`${yr} 年包含非該年份的照片喔！`);
+            }
+          }
+        }
+      }
+
+      renderStage3();
+
+      if (allCorrect) {
+        feedback.className = 'feedback-msg success';
+        feedback.textContent = "🎉 完美！2022 ~ 2026 共 20 段時空記憶已 100% 正確還原！正在開啟最高機密檔案...";
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+          setTimeout(() => {
+            confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0 } });
+            confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1 } });
+          }, 350);
+        }
+        setTimeout(() => {
+          showStage(4);
+        }, 1400);
+      } else {
+        feedback.className = 'feedback-msg';
+        feedback.textContent = `已完成 ${correctYearsCount} / 5 個年份！已用綠色框標記正確年份，其餘年份請參考下方提示調整～`;
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // =========================================================
+    // 🔧 【關卡 4：終極機密與生日禮物】
+    // =========================================================
+    function initStage4() {
+      const statusBadge = document.getElementById('sys-status-badge');
+      if (statusBadge) {
+        statusBadge.classList.remove('danger');
+        document.getElementById('sys-status-text').textContent = 'UNLOCKED';
+      }
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+
+      const openGiftBtn = document.getElementById('open-gift-btn');
+      if (openGiftBtn) {
+        openGiftBtn.onclick = function() {
+          this.style.display = 'none';
+          const card = document.getElementById('gift-reveal-card');
+          if (card) {
+            card.style.display = 'block';
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          if (typeof confetti === 'function') {
+            confetti({ particleCount: 130, spread: 85, origin: { y: 0.5 } });
+          }
+        };
+      }
+
+      const reviewBtn = document.getElementById('review-timeline-btn');
+      if (reviewBtn) {
+        reviewBtn.onclick = function() {
+          showStage(3);
+        };
+      }
+    }
+
+    // =========================================================
+    // 🔧 【開發與測試輔助函式】
+    // =========================================================
+    window.debugStage = function(stageNum) {
+      showStage(stageNum);
+    };
+
+    window.autoSolveStage3 = function() {
+      showStage(3);
+      for (const yObj of TIMELINE_DATA.years) {
+        const yr = yObj.year;
+        stage3State.years[yr] = yObj.photos.map(file => {
+          return TIMELINE_DATA.allPhotos.find(p => p.file === file).id;
+        });
+      }
+      stage3State.pool = [];
+      renderStage3();
+      verifyStage3();
+    };
+
+    // 檢查網址參數直接測試特定關卡 (例如 ?stage=3 或 ?stage=4)
+    const urlParams = new URLSearchParams(window.location.search);
+    const testStage = urlParams.get('stage');
+    if (testStage) {
+      showStage(parseInt(testStage, 10));
+    } else {
+      renderStage1();
+    }
   </script>
 </body>
 
